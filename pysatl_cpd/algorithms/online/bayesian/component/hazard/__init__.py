@@ -1,5 +1,5 @@
 # -*- coding: ascii -*-
-"""Hazard models for Bayesian online change-point detection.
+r"""Hazard models for Bayesian online change-point detection.
 
 This subpackage provides hazard (changepoint prior) models used in Bayesian
 online change-point detection. Hazard models define the probability that a
