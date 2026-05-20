@@ -1,5 +1,5 @@
 # -*- coding: ascii -*-
-"""Bayesian online change-point detection algorithms.
+r"""Bayesian online change-point detection algorithms.
 
 This package implements Bayesian online change-point detection (BOCPD) following
 the Adams and MacKay (2007) message-passing framework. It provides an abstract

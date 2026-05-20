@@ -53,6 +53,7 @@ class OnlineCpdPlotter[StateT: OnlineAlgorithmState]:
         The detection trace from online algorithm execution.
     layout
         Layout strategy to use. Can be:
+
         - An ILayoutStrategy instance
         - One of: "vertical", "split", "dashboard-lite", "dashboard"
         - None (defaults to "vertical")
@@ -728,6 +729,7 @@ class OnlineCpdPlotter[StateT: OnlineAlgorithmState]:
         ----------
         layout
             Layout strategy to use. Can be:
+
             - An ILayoutStrategy instance
             - One of: "vertical", "split", "dashboard-lite", "dashboard"
 
