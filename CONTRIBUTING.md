@@ -1,4 +1,4 @@
-# PySATL Core project contributing guide
+# PySATL CPD project contributing guide
 
 Thank you very much if you have decided to contribute to our project.
 We follow very simple and clear open-source research community accepted guidelines for contributing.

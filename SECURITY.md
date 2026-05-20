@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-PySATL Core is currently in early alpha. Security fixes are applied to the
+PySATL CPD is currently in early alpha. Security fixes are applied to the
 latest development line and to the latest published release once releases are
 available on PyPI.
 
