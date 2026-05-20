@@ -67,15 +67,17 @@ jobs:
       - name: Upload coverage to Coveralls
         uses: coverallsapp/github-action@v2
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           file: coverage.xml
           format: cobertura
           parallel: true
 
-    coveralls-finish:
-      needs: ci
-      runs-on: ubuntu-latest
-      steps:
-        - name: Close Coveralls build
-          uses: coverallsapp/github-action@v2
-          with:
-            parallel-finished: true
+  coveralls-finish:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close Coveralls build
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          parallel-finished: true
