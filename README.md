@@ -2,7 +2,7 @@
 
 [![mypy](https://img.shields.io/github/actions/workflow/status/PySATL/rework-pysatl-cpd/.github/workflows/ci.yaml?label=mypy&style=for-the-badge)](https://github.com/PySATL/rework-pysatl-cpd/actions/workflows/ci.yaml)
 [![Tests](https://img.shields.io/github/actions/workflow/status/PySATL/rework-pysatl-cpd/.github/workflows/ci.yaml?label=Tests&style=for-the-badge)](https://github.com/PySATL/rework-pysatl-cpd/actions/workflows/ci.yaml)
-[![Coverage Status](https://coveralls.io/repos/github/PySATL/rework-pysatl-cpd/badge.svg)](https://coveralls.io/github/PySATL/rework-pysatl-cpd)
+[![Coverage](https://img.shields.io/coverallsCoverage/github/PySATL/rework-pysatl-cpd?style=for-the-badge)](https://coveralls.io/github/PySATL/rework-pysatl-cpd)
 [![ruff](https://img.shields.io/github/actions/workflow/status/PySATL/rework-pysatl-cpd/.github/workflows/ci.yaml?label=ruff&style=for-the-badge)](https://github.com/PySATL/rework-pysatl-cpd/actions/workflows/ci.yaml)
 [![pydoclint](https://img.shields.io/github/actions/workflow/status/PySATL/rework-pysatl-cpd/.github/workflows/ci.yaml?label=pydoclint&style=for-the-badge)](https://github.com/PySATL/rework-pysatl-cpd/actions/workflows/ci.yaml)
 [![Docs](https://img.shields.io/github/actions/workflow/status/PySATL/rework-pysatl-cpd/.github/workflows/docs-deploy.yaml?label=Docs&style=for-the-badge)](https://github.com/PySATL/rework-pysatl-cpd/actions/workflows/docs-deploy.yaml)
