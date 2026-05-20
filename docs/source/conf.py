@@ -11,7 +11,7 @@ with (ROOT / "pyproject.toml").open("rb") as pyproject_file:
     PYPROJECT = tomllib.load(pyproject_file)
 
 project = "PySATL CPD"
-copyright = f"{datetime.now().year}, Leonid Elkin, Mikhail Mikhailov"
+copyright = f"{datetime.now().year}, Mikhail Mikhailov, Danil Totmyanin, Andrey Isakov"
 author = "Mikhail Mikhailov"
 release = PYPROJECT["tool"]["poetry"]["version"]
 
