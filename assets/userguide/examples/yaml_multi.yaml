@@ -7,9 +7,11 @@ scenarios:
     plans:
       baseline:
         distribution:
-          kind: normal
-          mean: 0.0
-          std: 1.0
+          kind: univariate
+          family: Normal
+          parametrization_name: meanStd
+          mu: 0.0
+          sigma: 1.0
         state:
           type: baseline
   second:
@@ -20,8 +22,10 @@ scenarios:
     plans:
       shifted:
         distribution:
-          kind: normal
-          mean: 4.0
-          std: 1.0
+          kind: univariate
+          family: Normal
+          parametrization_name: meanStd
+          mu: 4.0
+          sigma: 1.0
         state:
           type: shifted

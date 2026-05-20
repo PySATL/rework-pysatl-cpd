@@ -257,8 +257,24 @@ Load a scenario from a Python mapping::
     ...         {"plan_name": "b", "length": 20},
     ...     ],
     ...     "plans": {
-    ...         "a": {"distribution": {"kind": "normal", "mean": 0.0, "std": 1.0}},
-    ...         "b": {"distribution": {"kind": "normal", "mean": 2.0, "std": 1.0}},
+    ...         "a": {
+    ...             "distribution": {
+    ...                 "kind": "univariate",
+    ...                 "family": "Normal",
+    ...                 "parametrization_name": "meanStd",
+    ...                 "mu": 0.0,
+    ...                 "sigma": 1.0,
+    ...             }
+    ...         },
+    ...         "b": {
+    ...             "distribution": {
+    ...                 "kind": "univariate",
+    ...                 "family": "Normal",
+    ...                 "parametrization_name": "meanStd",
+    ...                 "mu": 2.0,
+    ...                 "sigma": 1.0,
+    ...             }
+    ...         },
     ...     },
     ... }
     >>> spec = scenario_from_mapping(mapping)

@@ -190,26 +190,6 @@ def parse_distribution_spec(mapping: Mapping[str, Any]) -> DistributionSpec:
     """
 
     kind = _require_str(mapping.get("kind"), "distribution.kind")
-    if kind == "normal":
-        return UnivariateDistributionSpec(
-            "Normal",
-            "meanStd",
-            mu=_optional_float(mapping.get("mean"), "distribution.mean", default=0.0),
-            sigma=_optional_float(mapping.get("std"), "distribution.std", default=1.0),
-        )
-    if kind == "uniform":
-        return UnivariateDistributionSpec(
-            "ContinuousUniform",
-            "standard",
-            lower_bound=_optional_float(mapping.get("low"), "distribution.low", default=0.0),
-            upper_bound=_optional_float(mapping.get("high"), "distribution.high", default=1.0),
-        )
-    if kind == "exponential":
-        return UnivariateDistributionSpec(
-            "Exponential",
-            "scale",
-            beta=_optional_float(mapping.get("scale"), "distribution.scale", default=1.0),
-        )
     if kind == "univariate":
         return _parse_univariate_family_distribution(mapping)
     if kind == "multivariate_normal":
@@ -512,24 +492,3 @@ def _require_float(raw: object, path: str) -> float:
     if not isinstance(raw, int | float) or isinstance(raw, bool):
         raise ValueError(f"{path} must be a number")
     return float(raw)
-
-
-def _optional_float(raw: object, path: str, *, default: float) -> float:
-    """
-    Get a float value or default if None.
-
-    Parameters
-    ----------
-    raw
-        Raw data to validate.
-    path
-        Path for error messages.
-    default
-        Default value if raw is None.
-
-    Returns
-    -------
-    value
-        Validated float or default.
-    """
-    return default if raw is None else _require_float(raw, path)
