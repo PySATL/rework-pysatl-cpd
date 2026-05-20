@@ -60,10 +60,10 @@ Use the chart with ``OnlineResetDetector`` for automatic reset-based detection::
     >>> from pysatl_cpd.core.online import OnlineResetDetector
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
-    ...     NormalSpec,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ...     build_plain_univariate_labeled_data,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
@@ -75,12 +75,12 @@ Use the chart with ``OnlineResetDetector`` for automatic reset-based detection::
     ...     ),
     ...     plans=frozendict(
     ...         base=SegmentPlan(
-    ...             distribution=NormalSpec(mean=0.0, std=1.0),
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
     ...             state=StateDescriptor(type="base"),
     ...             name="base",
     ...         ),
     ...         shift=SegmentPlan(
-    ...             distribution=NormalSpec(mean=3.0, std=1.0),
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=3.0, sigma=1.0),
     ...             state=StateDescriptor(type="shift"),
     ...             name="shift",
     ...         ),

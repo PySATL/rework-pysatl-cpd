@@ -13,10 +13,10 @@ import pytest
 
 from pysatl_cpd.data.generator.specs import (
     IndependentColumnsSpec,
-    NormalSpec,
     ScenarioSpec,
     SegmentPlan,
     SegmentSpec,
+    UnivariateDistributionSpec,
     freeze_distribution_mapping,
     freeze_float_mapping,
     freeze_state_mapping,
@@ -48,7 +48,7 @@ def test_segment_spec_rejects_non_positive_length() -> None:
 
 
 def test_scenario_spec_rejects_empty_name() -> None:
-    plan = SegmentPlan(distribution=NormalSpec())
+    plan = SegmentPlan(distribution=_normal())
 
     with pytest.raises(ValueError, match="Scenario name must not be empty"):
         ScenarioSpec(
@@ -59,7 +59,7 @@ def test_scenario_spec_rejects_empty_name() -> None:
 
 
 def test_scenario_spec_rejects_empty_segments() -> None:
-    plan = SegmentPlan(distribution=NormalSpec())
+    plan = SegmentPlan(distribution=_normal())
 
     with pytest.raises(ValueError, match="at least one segment"):
         ScenarioSpec(name="scenario", segments=(), plans=frozendict.from_mapping({"baseline": plan}))
@@ -84,16 +84,30 @@ def test_freeze_state_mapping_returns_state_descriptor() -> None:
 
 
 def test_freeze_univariate_mapping_returns_frozendict() -> None:
-    frozen = freeze_univariate_mapping({"baseline": NormalSpec(mean=1.0)})
+    frozen = freeze_univariate_mapping({"baseline": _normal(mean=1.0)})
 
     assert isinstance(frozen, frozendict)
-    assert frozen["baseline"] == NormalSpec(mean=1.0)
+    assert frozen["baseline"] == _normal(mean=1.0)
+
+
+def test_univariate_distribution_spec_rejects_empty_family() -> None:
+    with pytest.raises(ValueError, match="family must not be empty"):
+        UnivariateDistributionSpec("", "meanStd", mu=0.0, sigma=1.0)
+
+
+def test_univariate_distribution_spec_rejects_empty_parameter_name() -> None:
+    with pytest.raises(ValueError, match="parameter names must not be empty"):
+        UnivariateDistributionSpec("Normal", "meanStd", **{"": 1.0})
 
 
 def test_freeze_distribution_mapping_returns_frozendict() -> None:
-    plan_distribution = IndependentColumnsSpec(columns=frozendict.from_mapping({"x": NormalSpec()}))
+    plan_distribution = IndependentColumnsSpec(columns=frozendict.from_mapping({"x": _normal()}))
 
     frozen = freeze_distribution_mapping({"plan": plan_distribution})
 
     assert isinstance(frozen, frozendict)
     assert frozen["plan"] == plan_distribution
+
+
+def _normal(*, mean: float = 0.0, std: float = 1.0) -> UnivariateDistributionSpec:
+    return UnivariateDistributionSpec("Normal", "meanStd", mu=mean, sigma=std)

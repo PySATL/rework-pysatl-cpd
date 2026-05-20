@@ -49,10 +49,10 @@ Univariate visualization with Matplotlib::
     >>> from pysatl_cpd.analysis.visualization import DrawBackend, UnivariateTimeseriesVisualizer
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
-    ...     NormalSpec,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ...     build_plain_univariate_labeled_data,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
@@ -60,8 +60,16 @@ Univariate visualization with Matplotlib::
     ...     name="demo",
     ...     segments=(SegmentSpec(plan_name="a", length=50), SegmentSpec(plan_name="b", length=50)),
     ...     plans=frozendict(
-    ...         a=SegmentPlan(distribution=NormalSpec(mean=0.0, std=1.0), state=StateDescriptor(type="a"), name="a"),
-    ...         b=SegmentPlan(distribution=NormalSpec(mean=3.0, std=1.0), state=StateDescriptor(type="b"), name="b"),
+    ...         a=SegmentPlan(
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
+    ...             state=StateDescriptor(type="a"),
+    ...             name="a",
+    ...         ),
+    ...         b=SegmentPlan(
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=3.0, sigma=1.0),
+    ...             state=StateDescriptor(type="b"),
+    ...             name="b",
+    ...         ),
     ...     ),
     ... )
     >>> series = GenericSeriesGenerator(seed=42).generate_from_scenario(scenario, name="demo_series")
@@ -78,10 +86,10 @@ Plain multivariate visualization with Plotly::
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
     ...     IndependentColumnsSpec,
-    ...     NormalSpec,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ...     build_plain_multivariate_labeled_data,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
@@ -91,14 +99,20 @@ Plain multivariate visualization with Plotly::
     ...     plans=frozendict(
     ...         base=SegmentPlan(
     ...             distribution=IndependentColumnsSpec(
-    ...                 columns=frozendict(x=NormalSpec(mean=0.0, std=1.0), y=NormalSpec(mean=2.0, std=0.5))
+    ...                 columns=frozendict(
+    ...                     x=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
+    ...                     y=UnivariateDistributionSpec("Normal", "meanStd", mu=2.0, sigma=0.5),
+    ...                 )
     ...             ),
     ...             state=StateDescriptor(type="base"),
     ...             name="base",
     ...         ),
     ...         shift=SegmentPlan(
     ...             distribution=IndependentColumnsSpec(
-    ...                 columns=frozendict(x=NormalSpec(mean=3.0, std=1.0), y=NormalSpec(mean=0.5, std=0.5))
+    ...                 columns=frozendict(
+    ...                     x=UnivariateDistributionSpec("Normal", "meanStd", mu=3.0, sigma=1.0),
+    ...                     y=UnivariateDistributionSpec("Normal", "meanStd", mu=0.5, sigma=0.5),
+    ...                 )
     ...             ),
     ...             state=StateDescriptor(type="shift"),
     ...             name="shift",
@@ -119,10 +133,10 @@ Rich multivariate visualization with logical plots::
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
     ...     IndependentColumnsSpec,
-    ...     NormalSpec,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ...     build_pandas_labeled_data,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
@@ -132,14 +146,20 @@ Rich multivariate visualization with logical plots::
     ...     plans=frozendict(
     ...         base=SegmentPlan(
     ...             distribution=IndependentColumnsSpec(
-    ...                 columns=frozendict(sensor=NormalSpec(mean=0.0, std=1.0), load=NormalSpec(mean=20.0, std=1.0))
+    ...                 columns=frozendict(
+    ...                     sensor=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
+    ...                     load=UnivariateDistributionSpec("Normal", "meanStd", mu=20.0, sigma=1.0),
+    ...                 )
     ...             ),
     ...             state=StateDescriptor(type="base"),
     ...             name="base",
     ...         ),
     ...         shift=SegmentPlan(
     ...             distribution=IndependentColumnsSpec(
-    ...                 columns=frozendict(sensor=NormalSpec(mean=3.0, std=1.0), load=NormalSpec(mean=30.0, std=1.0))
+    ...                 columns=frozendict(
+    ...                     sensor=UnivariateDistributionSpec("Normal", "meanStd", mu=3.0, sigma=1.0),
+    ...                     load=UnivariateDistributionSpec("Normal", "meanStd", mu=30.0, sigma=1.0),
+    ...                 )
     ...             ),
     ...             state=StateDescriptor(type="shift"),
     ...             name="shift",

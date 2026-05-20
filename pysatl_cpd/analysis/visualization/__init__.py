@@ -123,10 +123,10 @@ Visualize a univariate time series with Matplotlib:
 ... )
 >>> from pysatl_cpd.data.generator import (
 ...     GenericSeriesGenerator,
-...     NormalSpec,
 ...     ScenarioSpec,
 ...     SegmentPlan,
 ...     SegmentSpec,
+...     UnivariateDistributionSpec,
 ...     build_plain_univariate_labeled_data,
 ... )
 >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
@@ -138,12 +138,12 @@ Visualize a univariate time series with Matplotlib:
 ...     ),
 ...     plans=frozendict(
 ...         a=SegmentPlan(
-...             distribution=NormalSpec(mean=0.0, std=1.0),
+...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
 ...             state=StateDescriptor(type="a"),
 ...             name="a",
 ...         ),
 ...         b=SegmentPlan(
-...             distribution=NormalSpec(mean=3.0, std=1.0),
+...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=3.0, sigma=1.0),
 ...             state=StateDescriptor(type="b"),
 ...             name="b",
 ...         ),

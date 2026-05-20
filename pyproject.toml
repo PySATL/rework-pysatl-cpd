@@ -28,6 +28,7 @@ pyyaml = "^6.0.3"
 ipykernel = "^7.2.0"
 joblib = ">=1.4.0"
 arch = ">=7.2.0"
+pysatl-core = "^0.1.0a0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.2.2"

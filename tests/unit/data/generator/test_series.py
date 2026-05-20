@@ -15,7 +15,13 @@ import pytest
 from pysatl_cpd.data.generator import GenericSeriesGenerator
 from pysatl_cpd.data.generator.providers.pd_provider import build_pandas_univariate_labeled_data
 from pysatl_cpd.data.generator.segments.models import GeneratedSegment
-from pysatl_cpd.data.generator.specs import IndependentColumnsSpec, NormalSpec, ScenarioSpec, SegmentPlan, SegmentSpec
+from pysatl_cpd.data.generator.specs import (
+    IndependentColumnsSpec,
+    ScenarioSpec,
+    SegmentPlan,
+    SegmentSpec,
+    UnivariateDistributionSpec,
+)
 from pysatl_cpd.data.typedefs import SegmentInfo, StateDescriptor, frozendict
 
 
@@ -26,11 +32,11 @@ def test_generate_direct_univariate_distribution_without_independent_columns() -
         plans=frozendict.from_mapping(
             {
                 "baseline": SegmentPlan(
-                    distribution=NormalSpec(mean=0.0, std=1.0),
+                    distribution=_normal(mean=0.0, std=1.0),
                     state=StateDescriptor(type="baseline"),
                 ),
                 "shifted": SegmentPlan(
-                    distribution=NormalSpec(mean=2.0, std=1.0),
+                    distribution=_normal(mean=2.0, std=1.0),
                     state=StateDescriptor(type="shifted"),
                 ),
             }
@@ -57,8 +63,8 @@ def test_reused_plan_name_creates_multiple_segments() -> None:
         ),
         plans=frozendict.from_mapping(
             {
-                "baseline": SegmentPlan(distribution=NormalSpec(mean=0.0, std=1.0)),
-                "shifted": SegmentPlan(distribution=NormalSpec(mean=1.0, std=1.0)),
+                "baseline": SegmentPlan(distribution=_normal(mean=0.0, std=1.0)),
+                "shifted": SegmentPlan(distribution=_normal(mean=1.0, std=1.0)),
             }
         ),
     )
@@ -74,7 +80,7 @@ def test_scenario_requires_referenced_plan() -> None:
         ScenarioSpec(
             name="invalid",
             segments=(SegmentSpec(plan_name="missing", length=1),),
-            plans=frozendict.from_mapping({"baseline": SegmentPlan(distribution=NormalSpec())}),
+            plans=frozendict.from_mapping({"baseline": SegmentPlan(distribution=_normal())}),
         )
 
 
@@ -84,10 +90,10 @@ def test_generate_from_scenario_rejects_mismatched_feature_names() -> None:
         segments=(SegmentSpec(plan_name="baseline", length=2), SegmentSpec(plan_name="shifted", length=2)),
         plans=frozendict.from_mapping(
             {
-                "baseline": SegmentPlan(distribution=NormalSpec()),
+                "baseline": SegmentPlan(distribution=_normal()),
                 "shifted": SegmentPlan(
                     distribution=IndependentColumnsSpec(
-                        columns=frozendict.from_mapping({"x": NormalSpec(), "y": NormalSpec()})
+                        columns=frozendict.from_mapping({"x": _normal(), "y": _normal()})
                     )
                 ),
             }
@@ -102,7 +108,7 @@ def test_generate_from_scenario_rejects_empty_segments_when_validation_is_bypass
     scenario = object.__new__(ScenarioSpec)
     object.__setattr__(scenario, "name", "empty")
     object.__setattr__(scenario, "segments", ())
-    object.__setattr__(scenario, "plans", frozendict.from_mapping({"baseline": SegmentPlan(distribution=NormalSpec())}))
+    object.__setattr__(scenario, "plans", frozendict.from_mapping({"baseline": SegmentPlan(distribution=_normal())}))
     object.__setattr__(scenario, "metadata", frozendict())
 
     with pytest.raises(ValueError, match="at least one segment"):
@@ -128,7 +134,7 @@ def test_build_pandas_univariate_labeled_data_selects_one_column() -> None:
     scenario = ScenarioSpec(
         name="univariate",
         segments=(SegmentSpec(plan_name="baseline", length=3),),
-        plans=frozendict.from_mapping({"baseline": SegmentPlan(distribution=NormalSpec())}),
+        plans=frozendict.from_mapping({"baseline": SegmentPlan(distribution=_normal())}),
     )
     generated = GenericSeriesGenerator(seed=42).generate_from_scenario(scenario)
 
@@ -143,7 +149,7 @@ def test_build_pandas_univariate_labeled_data_rejects_unknown_feature() -> None:
     scenario = ScenarioSpec(
         name="univariate",
         segments=(SegmentSpec(plan_name="baseline", length=3),),
-        plans=frozendict.from_mapping({"baseline": SegmentPlan(distribution=NormalSpec())}),
+        plans=frozendict.from_mapping({"baseline": SegmentPlan(distribution=_normal())}),
     )
     generated = GenericSeriesGenerator(seed=42).generate_from_scenario(scenario)
 
@@ -178,3 +184,7 @@ class _StubSegmentGenerator:
             ),
             metadata=frozendict(),
         )
+
+
+def _normal(*, mean: float = 0.0, std: float = 1.0) -> UnivariateDistributionSpec:
+    return UnivariateDistributionSpec("Normal", "meanStd", mu=mean, sigma=std)

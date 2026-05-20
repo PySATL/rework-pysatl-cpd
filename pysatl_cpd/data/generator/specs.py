@@ -14,63 +14,34 @@ from typing import Literal
 from pysatl_cpd.data.typedefs import NumericArray, StateDescriptor, StateValue, frozendict
 
 
-@dataclass(frozen=True, slots=True)
-class NormalSpec:
+@dataclass(frozen=True, slots=True, init=False)
+class UnivariateDistributionSpec:
     """
-    Normal distribution specification.
+    Core-backed univariate distribution specification.
 
-    Defines parameters for a normal (Gaussian) distribution used
-    in synthetic data generation.
-    """
-
-    kind: Literal["normal"] = "normal"
-    mean: float = 0.0
-    std: float = 1.0
-
-
-@dataclass(frozen=True, slots=True)
-class UniformSpec:
-    """
-    Uniform distribution specification.
-
-    Defines parameters for a uniform distribution over a fixed
-    interval used in synthetic data generation.
+    Stores the target core family, an optional parametrization name,
+    and the distribution parameters passed through as keyword arguments.
     """
 
-    kind: Literal["uniform"] = "uniform"
-    low: float = 0.0
-    high: float = 1.0
+    family: str
+    parametrization_name: str | None
+    parameters: frozendict[str, float]
+    kind: Literal["univariate"] = field(init=False, default="univariate")
 
+    def __init__(self, family: str, parametrization_name: str | None = None, **parameters: float) -> None:
+        if not family:
+            raise ValueError("Univariate distribution family must not be empty")
 
-@dataclass(frozen=True, slots=True)
-class ExponentialSpec:
-    """
-    Exponential distribution specification.
+        normalized_parameters: dict[str, float] = {}
+        for key, value in parameters.items():
+            if not key:
+                raise ValueError("Univariate distribution parameter names must not be empty")
+            normalized_parameters[key] = float(value)
 
-    Defines parameters for an exponential distribution used
-    in synthetic data generation.
-    """
-
-    kind: Literal["exponential"] = "exponential"
-    scale: float = 1.0
-
-
-@dataclass(frozen=True, slots=True)
-class StudentTSpec:
-    """
-    Student's t-distribution specification.
-
-    Defines parameters for a Student's t-distribution used
-    in synthetic data generation.
-    """
-
-    kind: Literal["student_t"] = "student_t"
-    df: float = 5.0
-    loc: float = 0.0
-    scale: float = 1.0
-
-
-type UnivariateDistributionSpec = NormalSpec | UniformSpec | ExponentialSpec | StudentTSpec
+        object.__setattr__(self, "kind", "univariate")
+        object.__setattr__(self, "family", family)
+        object.__setattr__(self, "parametrization_name", parametrization_name)
+        object.__setattr__(self, "parameters", frozendict.from_mapping(normalized_parameters))
 
 
 @dataclass(frozen=True, slots=True)
