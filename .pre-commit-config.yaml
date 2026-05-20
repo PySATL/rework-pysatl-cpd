@@ -61,13 +61,13 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        entry: poetry run mypy --config-file=pyproject.toml
+        entry: mypy --config-file=pyproject.toml
         language: system
         types_or: [python, pyi]
         pass_filenames: false
       - id: pydoclint
         name: pydoclint
-        entry: poetry run pydoclint
+        entry: pydoclint
         language: system
         types: [python]
         files: ^pysatl_cpd/
