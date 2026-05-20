@@ -1,0 +1,21 @@
+name: yaml_single
+segments:
+  - plan_name: baseline
+    length: 25
+  - plan_name: shifted
+    length: 15
+plans:
+  baseline:
+    distribution:
+      kind: normal
+      mean: 0.0
+      std: 1.0
+    state:
+      type: baseline
+  shifted:
+    distribution:
+      kind: normal
+      mean: 2.0
+      std: 1.0
+    state:
+      type: shifted

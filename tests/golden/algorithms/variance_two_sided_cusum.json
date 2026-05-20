@@ -1,0 +1,12 @@
+{
+  "algorithm": "VarianceTwoSidedCUSUM",
+  "final_state": {
+    "is_in_learning_period": false,
+    "statistics": {
+      "cov": [[0.0066666666666666706]],
+      "mean": [1.0]
+    }
+  },
+  "observations": [1.0, 1.1, 0.9, 1.0, 2.8, -1.0, 2.9, 1.0],
+  "values": [0.0, 0.0, 0.0, 0.0, 8.85354883100612, 22.829431355723862, 37.02010410130568, 46.18353005420124]
+}

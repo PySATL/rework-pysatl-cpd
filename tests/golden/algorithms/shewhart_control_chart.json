@@ -1,0 +1,12 @@
+{
+  "algorithm": "ShewhartControlChart",
+  "final_state": {
+    "is_in_learning_period": false,
+    "mean": 2.042857142857143,
+    "samples_count": 7,
+    "variance": 2.6310204081632658,
+    "window_contents": [4.7, 1.0]
+  },
+  "observations": [1.0, 1.2, 0.8, 1.1, 4.5, 4.7, 1.0],
+  "values": [0.0, 0.0, 0.0, 0.0, 0.7171371656006348, 1.093870714072489, 1.9937213137345304]
+}
