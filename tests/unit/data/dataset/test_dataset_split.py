@@ -11,7 +11,7 @@ __license__ = "SPDX-License-Identifier: MIT"
 
 from pysatl_cpd.data import Dataset
 from pysatl_cpd.data.generator.dataset import ScenarioDatasetGenerator
-from pysatl_cpd.data.generator.specs import NormalSpec, ScenarioSpec, SegmentPlan, SegmentSpec
+from pysatl_cpd.data.generator.specs import ScenarioSpec, SegmentPlan, SegmentSpec, UnivariateDistributionSpec
 from pysatl_cpd.data.typedefs import frozendict
 from tests.support.providers import make_univariate_labeled
 
@@ -38,7 +38,7 @@ def test_scenario_dataset_generator_scenarios_returns_copy() -> None:
             "demo": ScenarioSpec(
                 name="demo",
                 segments=(SegmentSpec(plan_name="baseline", length=2),),
-                plans=frozendict.from_mapping({"baseline": SegmentPlan(distribution=NormalSpec())}),
+                plans=frozendict.from_mapping({"baseline": SegmentPlan(distribution=_normal())}),
             )
         }
     )
@@ -47,3 +47,7 @@ def test_scenario_dataset_generator_scenarios_returns_copy() -> None:
     scenarios["other"] = scenarios["demo"]
 
     assert set(generator.scenarios) == {"demo"}
+
+
+def _normal(*, mean: float = 0.0, std: float = 1.0) -> UnivariateDistributionSpec:
+    return UnivariateDistributionSpec("Normal", "meanStd", mu=mean, sigma=std)

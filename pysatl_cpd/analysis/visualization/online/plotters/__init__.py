@@ -50,10 +50,10 @@ Basic usage with a univariate provider and detection trace::
     >>> from pysatl_cpd.core.online import OnlineResetDetector
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
-    ...     NormalSpec,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ...     build_plain_univariate_labeled_data,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
@@ -66,12 +66,12 @@ Basic usage with a univariate provider and detection trace::
     ...     ),
     ...     plans=frozendict(
     ...         a=SegmentPlan(
-    ...             distribution=NormalSpec(mean=0.0, std=1.0),
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
     ...             state=StateDescriptor(type="a"),
     ...             name="a",
     ...         ),
     ...         b=SegmentPlan(
-    ...             distribution=NormalSpec(mean=3.0, std=1.0),
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=3.0, sigma=1.0),
     ...             state=StateDescriptor(type="b"),
     ...             name="b",
     ...         ),

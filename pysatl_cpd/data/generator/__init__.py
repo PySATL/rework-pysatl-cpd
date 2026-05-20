@@ -9,9 +9,9 @@ detection algorithms under controlled conditions.
 Scenarios are defined as immutable specifications (``ScenarioSpec``) that
 separate the ordered sequence of segment occurrences from reusable segment
 plans. Each plan carries a distribution specification, a state descriptor,
-and optional metadata. Distribution specs support univariate distributions
-(normal, uniform, exponential, Student-t), multivariate normal with
-correlated features, and independent per-column distributions.
+and optional metadata. Distribution specs support core-backed
+univariate distributions, multivariate normal with correlated features,
+and independent per-column distributions.
 
 Generated series can be converted into labeled-provider types used by the
 data layer via the ``build_*`` helper functions, or assembled into full
@@ -23,12 +23,8 @@ from YAML files or plain Python mappings for config-driven workflows.
     <h2>Public API</h2>
 
 Distribution specifications
-    - ``NormalSpec`` -- Normal (Gaussian) distribution parameters.
-    - ``UniformSpec`` -- Uniform distribution over a fixed interval.
-    - ``ExponentialSpec`` -- Exponential distribution with scale parameter.
-    - ``StudentTSpec`` -- Student's t-distribution parameters.
-    - ``UnivariateDistributionSpec`` -- Type alias for the four univariate
-      specs above.
+    - ``UnivariateDistributionSpec`` -- Core-backed univariate
+      distribution parameters.
     - ``MultivariateNormalSpec`` -- Multivariate normal with named means
       and covariance structure.
     - ``IndependentColumnsSpec`` -- Per-column independent univariate
@@ -94,10 +90,10 @@ Generate a univariate mean-shift series from a scenario specification::
 
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
-    ...     NormalSpec,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
     >>> scenario = ScenarioSpec(
@@ -109,11 +105,11 @@ Generate a univariate mean-shift series from a scenario specification::
     ...     ),
     ...     plans=frozendict(
     ...         baseline=SegmentPlan(
-    ...             distribution=NormalSpec(mean=0.0, std=1.0),
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
     ...             state=StateDescriptor(type="baseline"),
     ...         ),
     ...         shifted=SegmentPlan(
-    ...             distribution=NormalSpec(mean=3.0, std=1.0),
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=3.0, sigma=1.0),
     ...             state=StateDescriptor(type="shifted"),
     ...         ),
     ...     ),
@@ -131,10 +127,10 @@ Generate a multivariate series with independent columns::
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
     ...     IndependentColumnsSpec,
-    ...     NormalSpec,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
     >>> mv_scenario = ScenarioSpec(
@@ -147,8 +143,8 @@ Generate a multivariate series with independent columns::
     ...         a=SegmentPlan(
     ...             distribution=IndependentColumnsSpec(
     ...                 columns=frozendict(
-    ...                     x=NormalSpec(mean=0.0, std=1.0),
-    ...                     y=NormalSpec(mean=10.0, std=2.0),
+    ...                     x=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
+    ...                     y=UnivariateDistributionSpec("Normal", "meanStd", mu=10.0, sigma=2.0),
     ...                 ),
     ...             ),
     ...             state=StateDescriptor(type="regime_a"),
@@ -156,8 +152,8 @@ Generate a multivariate series with independent columns::
     ...         b=SegmentPlan(
     ...             distribution=IndependentColumnsSpec(
     ...                 columns=frozendict(
-    ...                     x=NormalSpec(mean=5.0, std=1.0),
-    ...                     y=NormalSpec(mean=15.0, std=2.0),
+    ...                     x=UnivariateDistributionSpec("Normal", "meanStd", mu=5.0, sigma=1.0),
+    ...                     y=UnivariateDistributionSpec("Normal", "meanStd", mu=15.0, sigma=2.0),
     ...                 ),
     ...             ),
     ...             state=StateDescriptor(type="regime_b"),
@@ -176,10 +172,10 @@ Build a labeled provider from a generated series::
 
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
-    ...     NormalSpec,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ...     build_pandas_labeled_data,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
@@ -191,11 +187,11 @@ Build a labeled provider from a generated series::
     ...     ),
     ...     plans=frozendict(
     ...         a=SegmentPlan(
-    ...             distribution=NormalSpec(mean=0.0, std=1.0),
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
     ...             state=StateDescriptor(type="baseline"),
     ...         ),
     ...         b=SegmentPlan(
-    ...             distribution=NormalSpec(mean=3.0, std=1.0),
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=3.0, sigma=1.0),
     ...             state=StateDescriptor(type="shifted"),
     ...         ),
     ...     ),
@@ -211,27 +207,39 @@ Generate a dataset from multiple named scenarios::
 
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
-    ...     NormalSpec,
     ...     ScenarioDatasetGenerator,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
     >>> s1 = ScenarioSpec(
     ...     name="small_shift",
     ...     segments=(SegmentSpec(plan_name="a", length=50), SegmentSpec(plan_name="b", length=30)),
     ...     plans=frozendict(
-    ...         a=SegmentPlan(distribution=NormalSpec(mean=0.0, std=1.0), state=StateDescriptor(type="a")),
-    ...         b=SegmentPlan(distribution=NormalSpec(mean=1.0, std=1.0), state=StateDescriptor(type="b")),
+    ...         a=SegmentPlan(
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
+    ...             state=StateDescriptor(type="a"),
+    ...         ),
+    ...         b=SegmentPlan(
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=1.0, sigma=1.0),
+    ...             state=StateDescriptor(type="b"),
+    ...         ),
     ...     ),
     ... )
     >>> s2 = ScenarioSpec(
     ...     name="large_shift",
     ...     segments=(SegmentSpec(plan_name="a", length=50), SegmentSpec(plan_name="b", length=30)),
     ...     plans=frozendict(
-    ...         a=SegmentPlan(distribution=NormalSpec(mean=0.0, std=1.0), state=StateDescriptor(type="a")),
-    ...         b=SegmentPlan(distribution=NormalSpec(mean=5.0, std=1.0), state=StateDescriptor(type="b")),
+    ...         a=SegmentPlan(
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
+    ...             state=StateDescriptor(type="a"),
+    ...         ),
+    ...         b=SegmentPlan(
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=5.0, sigma=1.0),
+    ...             state=StateDescriptor(type="b"),
+    ...         ),
     ...     ),
     ... )
     >>> gen = ScenarioDatasetGenerator({"small": s1, "large": s2}, seed=0)
@@ -249,8 +257,24 @@ Load a scenario from a Python mapping::
     ...         {"plan_name": "b", "length": 20},
     ...     ],
     ...     "plans": {
-    ...         "a": {"distribution": {"kind": "normal", "mean": 0.0, "std": 1.0}},
-    ...         "b": {"distribution": {"kind": "normal", "mean": 2.0, "std": 1.0}},
+    ...         "a": {
+    ...             "distribution": {
+    ...                 "kind": "univariate",
+    ...                 "family": "Normal",
+    ...                 "parametrization_name": "meanStd",
+    ...                 "mu": 0.0,
+    ...                 "sigma": 1.0,
+    ...             }
+    ...         },
+    ...         "b": {
+    ...             "distribution": {
+    ...                 "kind": "univariate",
+    ...                 "family": "Normal",
+    ...                 "parametrization_name": "meanStd",
+    ...                 "mu": 2.0,
+    ...                 "sigma": 1.0,
+    ...             }
+    ...         },
     ...     },
     ... }
     >>> spec = scenario_from_mapping(mapping)
@@ -271,8 +295,7 @@ Generate a dataset from a built-in preset::
 Notes
 -----
 - All change-point indices are zero-based throughout the package.
-- Univariate distribution specs (``NormalSpec``, ``UniformSpec``,
-  ``ExponentialSpec``, ``StudentTSpec``) produce single-column arrays with
+- Univariate distribution specs produce single-column arrays with
   the default feature name ``"value"``.
 - ``MultivariateNormalSpec`` requires non-empty ``means`` with feature names
   as keys. The covariance can be a scalar, a 1-D sequence (diagonal), or a
@@ -308,34 +331,26 @@ from .segments import SegmentGenerator
 from .series import GenericSeriesGenerator
 from .specs import (
     DistributionSpec,
-    ExponentialSpec,
     IndependentColumnsSpec,
     MultivariateNormalSpec,
-    NormalSpec,
     ScenarioSpec,
     SegmentPlan,
     SegmentSpec,
-    StudentTSpec,
-    UniformSpec,
     UnivariateDistributionSpec,
 )
 
 __all__ = [
     "DistributionSpec",
-    "ExponentialSpec",
     "GenericSeriesGenerator",
     "IndependentColumnsSpec",
     "LabeledDataGenerator",
     "MultivariateNormalSpec",
-    "NormalSpec",
     "PRESET_SCENARIOS",
     "ScenarioDatasetGenerator",
     "ScenarioSpec",
     "SegmentGenerator",
     "SegmentPlan",
     "SegmentSpec",
-    "StudentTSpec",
-    "UniformSpec",
     "UnivariateDistributionSpec",
     "build_pandas_labeled_data",
     "build_pandas_univariate_labeled_data",

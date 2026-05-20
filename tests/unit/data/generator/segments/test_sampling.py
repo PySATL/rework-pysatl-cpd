@@ -19,21 +19,17 @@ from pysatl_cpd.data.generator.segments.sampling import (
     build_covariance_matrix,
     feature_names_for_distribution,
     sample_distribution,
-    sample_univariate_distribution,
 )
 from pysatl_cpd.data.generator.specs import (
-    ExponentialSpec,
     IndependentColumnsSpec,
     MultivariateNormalSpec,
-    NormalSpec,
-    StudentTSpec,
-    UniformSpec,
+    UnivariateDistributionSpec,
 )
 from pysatl_cpd.data.typedefs import frozendict
 
 
 def test_feature_names_for_distribution_covers_supported_specs() -> None:
-    assert feature_names_for_distribution(NormalSpec()) == (DEFAULT_UNIVARIATE_FEATURE_NAME,)
+    assert feature_names_for_distribution(_normal()) == (DEFAULT_UNIVARIATE_FEATURE_NAME,)
     assert feature_names_for_distribution(
         MultivariateNormalSpec(means=frozendict.from_mapping({"x": 0.0, "y": 1.0}))
     ) == (
@@ -41,7 +37,7 @@ def test_feature_names_for_distribution_covers_supported_specs() -> None:
         "y",
     )
     assert feature_names_for_distribution(
-        IndependentColumnsSpec(columns=frozendict.from_mapping({"x": NormalSpec(), "y": UniformSpec()}))
+        IndependentColumnsSpec(columns=frozendict.from_mapping({"x": _normal(), "y": _uniform()}))
     ) == ("x", "y")
 
 
@@ -52,24 +48,23 @@ def test_feature_names_for_distribution_rejects_unsupported_spec_type() -> None:
         feature_names_for_distribution(unsupported)
 
 
-def test_sample_univariate_distribution_covers_all_branches() -> None:
+def test_sample_distribution_covers_core_backed_univariate_variants() -> None:
     rng = np.random.default_rng(42)
-    assert sample_univariate_distribution(NormalSpec(mean=1.0, std=2.0), 3, rng).shape == (3,)
-    assert sample_univariate_distribution(UniformSpec(low=-1.0, high=1.0), 3, rng).shape == (3,)
-    assert sample_univariate_distribution(ExponentialSpec(scale=2.0), 3, rng).shape == (3,)
-    assert sample_univariate_distribution(StudentTSpec(df=5.0, loc=1.0, scale=2.0), 3, rng).shape == (3,)
+    assert sample_distribution(_normal(mean=1.0, std=2.0), 3, rng).shape == (3, 1)
+    assert sample_distribution(_uniform(low=-1.0, high=1.0), 3, rng).shape == (3, 1)
+    assert sample_distribution(_exponential(scale=2.0), 3, rng).shape == (3, 1)
 
 
 def test_sample_distribution_covers_univariate_multivariate_and_independent_columns() -> None:
     rng = np.random.default_rng(42)
-    univariate = sample_distribution(NormalSpec(), 4, rng)
+    univariate = sample_distribution(_normal(), 4, rng)
     multivariate = sample_distribution(
         MultivariateNormalSpec(means=frozendict.from_mapping({"x": 0.0, "y": 1.0}), covariance=(1.0, 2.0)),
         4,
         rng,
     )
     independent = sample_distribution(
-        IndependentColumnsSpec(columns=frozendict.from_mapping({"x": NormalSpec(), "y": UniformSpec()})),
+        IndependentColumnsSpec(columns=frozendict.from_mapping({"x": _normal(), "y": _uniform()})),
         4,
         rng,
     )
@@ -99,14 +94,6 @@ def test_sample_distribution_rejects_unsupported_spec_type() -> None:
         sample_distribution(unsupported, 3, rng)
 
 
-def test_sample_univariate_distribution_rejects_unsupported_spec_type() -> None:
-    rng = np.random.default_rng(42)
-    unsupported: Any = object()
-
-    with pytest.raises(TypeError, match="Unsupported univariate distribution spec type"):
-        sample_univariate_distribution(unsupported, 3, rng)
-
-
 def test_build_covariance_matrix_covers_scalar_diagonal_full_and_errors() -> None:
     assert build_covariance_matrix(2.0, 1).tolist() == [[2.0]]
     assert build_covariance_matrix((1.0, 2.0), 2).tolist() == [[1.0, 0.0], [0.0, 2.0]]
@@ -118,3 +105,15 @@ def test_build_covariance_matrix_covers_scalar_diagonal_full_and_errors() -> Non
         build_covariance_matrix((1.0,), 2)
     with pytest.raises(ValueError, match="Covariance matrix"):
         build_covariance_matrix(((1.0, 0.0),), 2)
+
+
+def _normal(*, mean: float = 0.0, std: float = 1.0) -> UnivariateDistributionSpec:
+    return UnivariateDistributionSpec("Normal", "meanStd", mu=mean, sigma=std)
+
+
+def _uniform(*, low: float = 0.0, high: float = 1.0) -> UnivariateDistributionSpec:
+    return UnivariateDistributionSpec("ContinuousUniform", "standard", lower_bound=low, upper_bound=high)
+
+
+def _exponential(*, scale: float = 1.0) -> UnivariateDistributionSpec:
+    return UnivariateDistributionSpec("Exponential", "scale", beta=scale)

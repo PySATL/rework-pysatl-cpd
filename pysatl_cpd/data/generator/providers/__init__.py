@@ -35,10 +35,10 @@ Build a pandas multivariate labeled provider from a generated series::
 
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
-    ...     NormalSpec,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ...     build_pandas_labeled_data,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
@@ -50,11 +50,11 @@ Build a pandas multivariate labeled provider from a generated series::
     ...     ),
     ...     plans=frozendict(
     ...         a=SegmentPlan(
-    ...             distribution=NormalSpec(mean=0.0, std=1.0),
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
     ...             state=StateDescriptor(type="baseline"),
     ...         ),
     ...         b=SegmentPlan(
-    ...             distribution=NormalSpec(mean=3.0, std=1.0),
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=3.0, sigma=1.0),
     ...             state=StateDescriptor(type="shifted"),
     ...         ),
     ...     ),
@@ -74,6 +74,7 @@ Build a plain univariate labeled provider by selecting a single feature::
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ...     build_plain_univariate_labeled_data,
     ... )
     >>> from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
@@ -87,8 +88,8 @@ Build a plain univariate labeled provider by selecting a single feature::
     ...         a=SegmentPlan(
     ...             distribution=IndependentColumnsSpec(
     ...                 columns=frozendict(
-    ...                     x=NormalSpec(mean=0.0, std=1.0),
-    ...                     y=NormalSpec(mean=10.0, std=2.0),
+    ...                     x=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0),
+    ...                     y=UnivariateDistributionSpec("Normal", "meanStd", mu=10.0, sigma=2.0),
     ...                 ),
     ...             ),
     ...             state=StateDescriptor(type="baseline"),
@@ -96,8 +97,8 @@ Build a plain univariate labeled provider by selecting a single feature::
     ...         b=SegmentPlan(
     ...             distribution=IndependentColumnsSpec(
     ...                 columns=frozendict(
-    ...                     x=NormalSpec(mean=5.0, std=1.0),
-    ...                     y=NormalSpec(mean=15.0, std=2.0),
+    ...                     x=UnivariateDistributionSpec("Normal", "meanStd", mu=5.0, sigma=1.0),
+    ...                     y=UnivariateDistributionSpec("Normal", "meanStd", mu=15.0, sigma=2.0),
     ...                 ),
     ...             ),
     ...             state=StateDescriptor(type="shifted"),

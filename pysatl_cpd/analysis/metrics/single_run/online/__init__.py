@@ -30,10 +30,10 @@ Compute delays and run lengths for a single online detection run::
     >>> from pysatl_cpd.core.single_run import SingleRun
     >>> from pysatl_cpd.data.generator import (
     ...     GenericSeriesGenerator,
-    ...     NormalSpec,
     ...     ScenarioSpec,
     ...     SegmentPlan,
     ...     SegmentSpec,
+    ...     UnivariateDistributionSpec,
     ...     build_plain_univariate_labeled_data,
     ... )
     >>> from pysatl_cpd.data.typedefs import frozendict
@@ -44,8 +44,12 @@ Compute delays and run lengths for a single online detection run::
     ...         SegmentSpec(plan_name="shifted", length=100),
     ...     ),
     ...     plans=frozendict(
-    ...         baseline=SegmentPlan(distribution=NormalSpec(mean=0.0, std=1.0)),
-    ...         shifted=SegmentPlan(distribution=NormalSpec(mean=2.0, std=1.0)),
+    ...         baseline=SegmentPlan(
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0)
+    ...         ),
+    ...         shifted=SegmentPlan(
+    ...             distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=2.0, sigma=1.0)
+    ...         ),
     ...     ),
     ... )
     >>> series = GenericSeriesGenerator(seed=42).generate_from_scenario(scenario)

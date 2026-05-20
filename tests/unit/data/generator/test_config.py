@@ -24,11 +24,9 @@ from pysatl_cpd.data.generator.config import (
     scenarios_from_yaml,
 )
 from pysatl_cpd.data.generator.specs import (
-    ExponentialSpec,
     IndependentColumnsSpec,
     MultivariateNormalSpec,
-    NormalSpec,
-    StudentTSpec,
+    UnivariateDistributionSpec,
 )
 
 
@@ -43,11 +41,23 @@ def test_scenario_from_mapping_loads_direct_univariate_distribution() -> None:
             "plans": {
                 "baseline": {
                     "state": {"type": "baseline"},
-                    "distribution": {"kind": "normal", "mean": 0.0, "std": 1.0},
+                    "distribution": {
+                        "kind": "univariate",
+                        "family": "Normal",
+                        "parametrization_name": "meanStd",
+                        "mu": 0.0,
+                        "sigma": 1.0,
+                    },
                 },
                 "shifted": {
                     "state": {"type": "shifted"},
-                    "distribution": {"kind": "normal", "mean": 2.0, "std": 1.0},
+                    "distribution": {
+                        "kind": "univariate",
+                        "family": "Normal",
+                        "parametrization_name": "meanStd",
+                        "mu": 2.0,
+                        "sigma": 1.0,
+                    },
                 },
             },
         }
@@ -56,7 +66,7 @@ def test_scenario_from_mapping_loads_direct_univariate_distribution() -> None:
     assert scenario.name == "mean_shift"
     assert scenario.segments[0].plan_name == "baseline"
     assert scenario.segments[0].length == 10
-    assert isinstance(scenario.plans["baseline"].distribution, NormalSpec)
+    assert isinstance(scenario.plans["baseline"].distribution, UnivariateDistributionSpec)
     assert scenario.plans["baseline"].state is not None
     assert scenario.plans["baseline"].state["type"] == "baseline"
 
@@ -71,8 +81,20 @@ def test_scenario_from_mapping_loads_independent_columns_distribution() -> None:
                     "distribution": {
                         "kind": "independent_columns",
                         "columns": {
-                            "x": {"kind": "normal", "mean": 0.0, "std": 1.0},
-                            "y": {"kind": "uniform", "low": -1.0, "high": 1.0},
+                            "x": {
+                                "kind": "univariate",
+                                "family": "Normal",
+                                "parametrization_name": "meanStd",
+                                "mu": 0.0,
+                                "sigma": 1.0,
+                            },
+                            "y": {
+                                "kind": "univariate",
+                                "family": "ContinuousUniform",
+                                "parametrization_name": "standard",
+                                "lower_bound": -1.0,
+                                "upper_bound": 1.0,
+                            },
                         },
                     }
                 }
@@ -118,9 +140,11 @@ segments:
 plans:
   baseline:
     distribution:
-      kind: normal
-      mean: 0.0
-      std: 1.0
+      kind: univariate
+      family: Normal
+      parametrization_name: meanStd
+      mu: 0.0
+      sigma: 1.0
 """,
         encoding="utf-8",
     )
@@ -128,7 +152,7 @@ plans:
     scenario = scenario_from_yaml(path)
 
     assert scenario.name == "yaml_scenario"
-    assert isinstance(scenario.plans["baseline"].distribution, NormalSpec)
+    assert isinstance(scenario.plans["baseline"].distribution, UnivariateDistributionSpec)
 
 
 def test_scenarios_from_yaml_loads_mapping(tmp_path) -> None:  # type: ignore[no-untyped-def]
@@ -144,7 +168,11 @@ scenarios:
     plans:
       baseline:
         distribution:
-          kind: normal
+          kind: univariate
+          family: Normal
+          parametrization_name: meanStd
+          mu: 0.0
+          sigma: 1.0
 """,
         encoding="utf-8",
     )
@@ -166,7 +194,11 @@ segments:
 plans:
   baseline:
     distribution:
-      kind: normal
+      kind: univariate
+      family: Normal
+      parametrization_name: meanStd
+      mu: 0.0
+      sigma: 1.0
 """,
         encoding="utf-8",
     )
@@ -175,6 +207,31 @@ plans:
 
     assert list(scenarios) == ["fallback"]
     assert scenarios["fallback"].name == "fallback"
+
+
+def test_scenario_from_yaml_loads_custom_parametrization_name(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    path = tmp_path / "scenario.yaml"
+    path.write_text(
+        """
+name: yaml_scenario
+segments:
+  - plan_name: baseline
+    length: 3
+plans:
+  baseline:
+    distribution:
+      kind: univariate
+      family: Normal
+      parametrization_name: meanStd
+      mu: 0.0
+      sigma: 1.0
+""",
+        encoding="utf-8",
+    )
+
+    scenario = scenario_from_yaml(path)
+
+    assert scenario.plans["baseline"].distribution == UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0)
 
 
 def test_scenario_from_mapping_rejects_unknown_distribution_kind() -> None:
@@ -224,15 +281,25 @@ def test_scenarios_from_yaml_rejects_non_mapping_single_scenario(tmp_path) -> No
 
 
 def test_parse_distribution_spec_loads_exponential_distribution() -> None:
-    distribution = parse_distribution_spec({"kind": "exponential", "scale": 2.5})
+    distribution = parse_distribution_spec(
+        {"kind": "univariate", "family": "Exponential", "parametrization_name": "scale", "beta": 2.5}
+    )
 
-    assert distribution == ExponentialSpec(scale=2.5)
+    assert distribution == UnivariateDistributionSpec("Exponential", "scale", beta=2.5)
 
 
-def test_parse_distribution_spec_loads_student_t_distribution() -> None:
-    distribution = parse_distribution_spec({"kind": "student_t", "df": 7.0, "loc": 1.0, "scale": 2.0})
+def test_parse_distribution_spec_loads_explicit_univariate_distribution() -> None:
+    distribution = parse_distribution_spec(
+        {"kind": "univariate", "family": "Normal", "parametrization_name": "meanStd", "mu": 1.0, "sigma": 2.0}
+    )
 
-    assert distribution == StudentTSpec(df=7.0, loc=1.0, scale=2.0)
+    assert distribution == UnivariateDistributionSpec("Normal", "meanStd", mu=1.0, sigma=2.0)
+
+
+def test_parse_distribution_spec_loads_explicit_univariate_distribution_without_parametrization() -> None:
+    distribution = parse_distribution_spec({"kind": "univariate", "family": "Normal", "mu": 1.0, "sigma": 2.0})
+
+    assert distribution == UnivariateDistributionSpec("Normal", None, mu=1.0, sigma=2.0)
 
 
 def test_parse_distribution_spec_loads_independent_columns_univariate_variants() -> None:
@@ -240,15 +307,39 @@ def test_parse_distribution_spec_loads_independent_columns_univariate_variants()
         {
             "kind": "independent_columns",
             "columns": {
-                "exp": {"kind": "exponential", "scale": 3.0},
-                "student": {"kind": "student_t", "df": 4.0},
+                "exp": {
+                    "kind": "univariate",
+                    "family": "Exponential",
+                    "parametrization_name": "scale",
+                    "beta": 3.0,
+                },
+                "uniform": {
+                    "kind": "univariate",
+                    "family": "ContinuousUniform",
+                    "parametrization_name": "standard",
+                    "lower_bound": -2.0,
+                    "upper_bound": 2.0,
+                },
             },
         }
     )
 
     assert isinstance(distribution, IndependentColumnsSpec)
-    assert distribution.columns["exp"] == ExponentialSpec(scale=3.0)
-    assert distribution.columns["student"] == StudentTSpec(df=4.0)
+    assert distribution.columns["exp"] == UnivariateDistributionSpec("Exponential", "scale", beta=3.0)
+    assert distribution.columns["uniform"] == (
+        UnivariateDistributionSpec("ContinuousUniform", "standard", lower_bound=-2.0, upper_bound=2.0)
+    )
+
+
+def test_parse_distribution_spec_rejects_student_t_distribution() -> None:
+    with pytest.raises(ValueError, match="Unsupported distribution kind"):
+        parse_distribution_spec({"kind": "student_t", "df": 7.0})
+
+
+@pytest.mark.parametrize("kind", ["normal", "uniform", "exponential"])
+def test_parse_distribution_spec_rejects_removed_legacy_univariate_kinds(kind: str) -> None:
+    with pytest.raises(ValueError, match=rf"Unsupported distribution kind '{kind}'"):
+        parse_distribution_spec({"kind": kind})
 
 
 def test_parse_hashable_mapping_rejects_non_hashable_value() -> None:
@@ -311,7 +402,7 @@ def test_scenario_from_mapping_rejects_non_scalar_state_value() -> None:
                 "plans": {
                     "baseline": {
                         "state": {"bad": []},
-                        "distribution": {"kind": "normal"},
+                        "distribution": {"kind": "univariate", "family": "Normal", "mu": 0.0, "sigma": 1.0},
                     }
                 },
             }

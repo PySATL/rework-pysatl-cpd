@@ -15,15 +15,11 @@ import yaml
 
 from pysatl_cpd.data.generator.specs import (
     DistributionSpec,
-    ExponentialSpec,
     IndependentColumnsSpec,
     MultivariateNormalSpec,
-    NormalSpec,
     ScenarioSpec,
     SegmentPlan,
     SegmentSpec,
-    StudentTSpec,
-    UniformSpec,
     UnivariateDistributionSpec,
 )
 from pysatl_cpd.data.typedefs import StateDescriptor, StateValue, frozendict
@@ -194,24 +190,8 @@ def parse_distribution_spec(mapping: Mapping[str, Any]) -> DistributionSpec:
     """
 
     kind = _require_str(mapping.get("kind"), "distribution.kind")
-    if kind == "normal":
-        return NormalSpec(
-            mean=_optional_float(mapping.get("mean"), "distribution.mean", default=0.0),
-            std=_optional_float(mapping.get("std"), "distribution.std", default=1.0),
-        )
-    if kind == "uniform":
-        return UniformSpec(
-            low=_optional_float(mapping.get("low"), "distribution.low", default=0.0),
-            high=_optional_float(mapping.get("high"), "distribution.high", default=1.0),
-        )
-    if kind == "exponential":
-        return ExponentialSpec(scale=_optional_float(mapping.get("scale"), "distribution.scale", default=1.0))
-    if kind == "student_t":
-        return StudentTSpec(
-            df=_optional_float(mapping.get("df"), "distribution.df", default=5.0),
-            loc=_optional_float(mapping.get("loc"), "distribution.loc", default=0.0),
-            scale=_optional_float(mapping.get("scale"), "distribution.scale", default=1.0),
-        )
+    if kind == "univariate":
+        return _parse_univariate_family_distribution(mapping)
     if kind == "multivariate_normal":
         means = _parse_float_mapping(mapping.get("means"), "distribution.means")
         covariance = _parse_covariance(mapping.get("covariance", 1.0), "distribution.covariance")
@@ -246,9 +226,26 @@ def _parse_univariate_distribution(mapping: Mapping[str, Any]) -> UnivariateDist
         If the distribution is not a univariate type.
     """
     distribution = parse_distribution_spec(mapping)
-    if not isinstance(distribution, NormalSpec | UniformSpec | ExponentialSpec | StudentTSpec):
+    if not isinstance(distribution, UnivariateDistributionSpec):
         raise ValueError("Independent column distributions must be univariate")
     return distribution
+
+
+def _parse_univariate_family_distribution(mapping: Mapping[str, Any]) -> UnivariateDistributionSpec:
+    """Parse a core-backed univariate distribution specification."""
+    family = _require_str(mapping.get("family"), "distribution.family")
+    parametrization_name_raw = mapping.get("parametrization_name")
+    parametrization_name = (
+        None
+        if parametrization_name_raw is None
+        else _require_str(parametrization_name_raw, "distribution.parametrization_name")
+    )
+    parameters = {
+        str(key): _require_float(value, f"distribution.{key}")
+        for key, value in mapping.items()
+        if key not in {"kind", "family", "parametrization_name"}
+    }
+    return UnivariateDistributionSpec(family, parametrization_name, **parameters)
 
 
 def _parse_float_mapping(raw: object, path: str) -> dict[str, float]:
@@ -495,24 +492,3 @@ def _require_float(raw: object, path: str) -> float:
     if not isinstance(raw, int | float) or isinstance(raw, bool):
         raise ValueError(f"{path} must be a number")
     return float(raw)
-
-
-def _optional_float(raw: object, path: str, *, default: float) -> float:
-    """
-    Get a float value or default if None.
-
-    Parameters
-    ----------
-    raw
-        Raw data to validate.
-    path
-        Path for error messages.
-    default
-        Default value if raw is None.
-
-    Returns
-    -------
-    value
-        Validated float or default.
-    """
-    return default if raw is None else _require_float(raw, path)

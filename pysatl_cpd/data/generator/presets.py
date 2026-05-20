@@ -16,10 +16,10 @@ from pysatl_cpd.data.generator.specs import (
     DistributionSpec,
     IndependentColumnsSpec,
     MultivariateNormalSpec,
-    NormalSpec,
     ScenarioSpec,
     SegmentPlan,
     SegmentSpec,
+    UnivariateDistributionSpec,
 )
 from pysatl_cpd.data.typedefs import StateDescriptor, frozendict
 
@@ -264,15 +264,20 @@ def _distribution_for_segment_type(
         if segment_type == "mean_shift":
             return IndependentColumnsSpec(
                 columns=frozendict.from_mapping(
-                    {feature_name: NormalSpec(mean=2.5, std=1.0) for feature_name in feature_names}
+                    {feature_name: _normal_distribution(mean=2.5, std=1.0) for feature_name in feature_names}
                 )
             )
         return IndependentColumnsSpec(
             columns=frozendict.from_mapping(
-                {feature_name: NormalSpec(mean=0.0, std=1.0) for feature_name in feature_names}
+                {feature_name: _normal_distribution(mean=0.0, std=1.0) for feature_name in feature_names}
             )
         )
     raise ValueError(f"Unsupported preset '{preset}'")
+
+
+def _normal_distribution(*, mean: float = 0.0, std: float = 1.0) -> UnivariateDistributionSpec:
+    """Build the default core-backed normal distribution spec."""
+    return UnivariateDistributionSpec("Normal", "meanStd", mu=mean, sigma=std)
 
 
 def _multivariate_distribution_for_segment_type(

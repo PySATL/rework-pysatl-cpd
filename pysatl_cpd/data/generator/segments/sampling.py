@@ -7,16 +7,16 @@ __author__ = "Mikhail Mikhailov"
 __copyright__ = "Copyright (c) 2026 PySATL project"
 __license__ = "SPDX-License-Identifier: MIT"
 
+
 import numpy as np
+from pysatl_core.families.configuration import configure_families_register
+from pysatl_core.families.registry import ParametricFamilyRegister
 
 from pysatl_cpd.data.generator.specs import (
     DistributionSpec,
-    ExponentialSpec,
     IndependentColumnsSpec,
     MultivariateNormalSpec,
-    NormalSpec,
-    StudentTSpec,
-    UniformSpec,
+    UnivariateDistributionSpec,
 )
 from pysatl_cpd.data.typedefs import NumericArray
 
@@ -42,7 +42,7 @@ def feature_names_for_distribution(distribution: DistributionSpec) -> tuple[str,
     TypeError
         If the distribution type is not supported.
     """
-    if isinstance(distribution, NormalSpec | UniformSpec | ExponentialSpec | StudentTSpec):
+    if isinstance(distribution, UnivariateDistributionSpec):
         return (DEFAULT_UNIVARIATE_FEATURE_NAME,)
     if isinstance(distribution, MultivariateNormalSpec):
         return tuple(distribution.means)
@@ -78,8 +78,8 @@ def sample_distribution(
     TypeError
         If the distribution type is not supported.
     """
-    if isinstance(distribution, NormalSpec | UniformSpec | ExponentialSpec | StudentTSpec):
-        return sample_univariate_distribution(distribution, length, rng).reshape(-1, 1)
+    if isinstance(distribution, UnivariateDistributionSpec):
+        return _sample_core_univariate_distribution(distribution, length).reshape(-1, 1)
 
     if isinstance(distribution, MultivariateNormalSpec):
         covariance = build_covariance_matrix(distribution.covariance, len(distribution.means))
@@ -90,48 +90,23 @@ def sample_distribution(
         return sampled
 
     if isinstance(distribution, IndependentColumnsSpec):
-        columns = [sample_univariate_distribution(spec, length, rng) for spec in distribution.columns.values()]
+        columns = [_sample_core_univariate_distribution(spec, length) for spec in distribution.columns.values()]
         return np.column_stack(columns)
 
     raise TypeError(f"Unsupported distribution spec type: {type(distribution).__name__}")
 
 
-def sample_univariate_distribution(
-    distribution: NormalSpec | UniformSpec | ExponentialSpec | StudentTSpec,
-    length: int,
-    rng: np.random.Generator,
-) -> NumericArray:
-    """
-    Sample from a univariate distribution specification.
-
-    Parameters
-    ----------
-    distribution
-        Univariate distribution specification.
-    length
-        Number of samples to generate.
-    rng
-        Random number generator for reproducible sampling.
-
-    Returns
-    -------
-    samples
-        Array of sampled values.
-
-    Raises
-    ------
-    TypeError
-        If the distribution type is not supported.
-    """
-    if isinstance(distribution, NormalSpec):
-        return rng.normal(loc=distribution.mean, scale=distribution.std, size=length)
-    if isinstance(distribution, UniformSpec):
-        return rng.uniform(low=distribution.low, high=distribution.high, size=length)
-    if isinstance(distribution, ExponentialSpec):
-        return rng.exponential(scale=distribution.scale, size=length)
-    if isinstance(distribution, StudentTSpec):
-        return rng.standard_t(df=distribution.df, size=length) * distribution.scale + distribution.loc
-    raise TypeError(f"Unsupported univariate distribution spec type: {type(distribution).__name__}")
+def _sample_core_univariate_distribution(distribution: UnivariateDistributionSpec, length: int) -> NumericArray:
+    """Sample a univariate distribution through pysatl-core."""
+    configure_families_register()
+    family = ParametricFamilyRegister.get(distribution.family)
+    core_distribution = family.distribution(
+        parametrization_name=distribution.parametrization_name,
+        sampling_strategy=None,
+        computation_strategy=None,
+        **dict(distribution.parameters),
+    )
+    return np.asarray(core_distribution.sample(length), dtype=np.float64).reshape(length)
 
 
 def build_covariance_matrix(

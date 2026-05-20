@@ -31,10 +31,10 @@ Examples
 Sample from a univariate distribution spec::
 
     >>> import numpy as np
-    >>> from pysatl_cpd.data.generator import NormalSpec
+    >>> from pysatl_cpd.data.generator import UnivariateDistributionSpec
     >>> from pysatl_cpd.data.generator.segments import sample_distribution
     >>> rng = np.random.default_rng(42)
-    >>> spec = NormalSpec(mean=0.0, std=1.0)
+    >>> spec = UnivariateDistributionSpec("Normal", "meanStd", mu=0.0, sigma=1.0)
     >>> data = sample_distribution(spec, length=5, rng=rng)
     >>> data.shape
     (5, 1)
@@ -64,7 +64,7 @@ Implement a custom segment generator using the ``SegmentGenerator`` protocol::
     ...     SegmentGenerator,
     ...     sample_distribution,
     ... )
-    >>> from pysatl_cpd.data.generator import NormalSpec, SegmentPlan
+    >>> from pysatl_cpd.data.generator import SegmentPlan, UnivariateDistributionSpec
     >>> from pysatl_cpd.data.typedefs import SegmentInfo, StateDescriptor, frozendict
     >>> import numpy as np
     >>> class SimpleGenerator:
@@ -93,7 +93,10 @@ Implement a custom segment generator using the ``SegmentGenerator`` protocol::
     ...             ),
     ...             metadata=self._plan.metadata,
     ...         )
-    >>> plan = SegmentPlan(distribution=NormalSpec(mean=2.0, std=0.5), name="shifted")
+    >>> plan = SegmentPlan(
+    ...     distribution=UnivariateDistributionSpec("Normal", "meanStd", mu=2.0, sigma=0.5),
+    ...     name="shifted",
+    ... )
     >>> gen = SimpleGenerator(plan, length=10)
     >>> segment = gen.generate(rng=np.random.default_rng(0))
     >>> segment.name
@@ -108,7 +111,7 @@ Implement a custom segment generator using the ``SegmentGenerator`` protocol::
 Notes
 -----
 - Sampling functions require a ``DistributionSpec`` from
-  ``pysatl_cpd.data.generator.specs`` (e.g., ``NormalSpec``, ``UniformSpec``,
+  ``pysatl_cpd.data.generator.specs`` (e.g., ``UnivariateDistributionSpec``,
   ``MultivariateNormalSpec``, ``IndependentColumnsSpec``).
 - All returned arrays have shape ``(length, num_features)``. Univariate
   distributions produce a single-column array.

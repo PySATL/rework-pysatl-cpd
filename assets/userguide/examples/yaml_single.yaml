@@ -7,15 +7,19 @@ segments:
 plans:
   baseline:
     distribution:
-      kind: normal
-      mean: 0.0
-      std: 1.0
+      kind: univariate
+      family: Normal
+      parametrization_name: meanStd
+      mu: 0.0
+      sigma: 1.0
     state:
       type: baseline
   shifted:
     distribution:
-      kind: normal
-      mean: 2.0
-      std: 1.0
+      kind: univariate
+      family: Normal
+      parametrization_name: meanStd
+      mu: 2.0
+      sigma: 1.0
     state:
       type: shifted
