@@ -7,12 +7,10 @@ __author__ = "Mikhail Mikhailov"
 __copyright__ = "Copyright (c) 2026 PySATL project"
 __license__ = "SPDX-License-Identifier: MIT"
 
-from typing import Any, cast
 
 import numpy as np
 from pysatl_core.families.configuration import configure_families_register
 from pysatl_core.families.registry import ParametricFamilyRegister
-from pysatl_core.sampling.unuran.core.unuran_sampling_strategy import DefaultUnuranSamplingStrategy
 
 from pysatl_cpd.data.generator.specs import (
     DistributionSpec,
@@ -102,10 +100,10 @@ def _sample_core_univariate_distribution(distribution: UnivariateDistributionSpe
     """Sample a univariate distribution through pysatl-core."""
     configure_families_register()
     family = ParametricFamilyRegister.get(distribution.family)
-    distribution_factory = cast(Any, family.distribution)
-    core_distribution = distribution_factory(
+    core_distribution = family.distribution(
         parametrization_name=distribution.parametrization_name,
-        sampling_strategy=DefaultUnuranSamplingStrategy(),
+        sampling_strategy=None,
+        computation_strategy=None,
         **dict(distribution.parameters),
     )
     return np.asarray(core_distribution.sample(length), dtype=np.float64).reshape(length)
