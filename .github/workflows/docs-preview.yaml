@@ -2,7 +2,8 @@ name: Docs Preview
 
 on:
   pull_request:
-    branches: [ main ]
+  push:
+    branches-ignore: [ main ]
 
 permissions:
   contents: read
@@ -29,6 +30,9 @@ jobs:
 
       - name: Generate API
         run: poetry run python docs/source/generate_api.py
+
+      - name: Generate User Guide
+        run: poetry run python docs/source/generate_user_guide.py
 
       - name: Build docs (Sphinx)
         run: |

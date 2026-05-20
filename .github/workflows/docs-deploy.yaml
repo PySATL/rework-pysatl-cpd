@@ -40,6 +40,9 @@ jobs:
       - name: Generate API
         run: poetry run python docs/source/generate_api.py
 
+      - name: Generate User Guide
+        run: poetry run python docs/source/generate_user_guide.py
+
       - name: Build docs (Sphinx)
         run: |
           poetry run sphinx-build -E -a -b html docs/source docs/build/html
