@@ -1,0 +1,27 @@
+scenarios:
+  first:
+    name: first
+    segments:
+      - plan_name: baseline
+        length: 20
+    plans:
+      baseline:
+        distribution:
+          kind: normal
+          mean: 0.0
+          std: 1.0
+        state:
+          type: baseline
+  second:
+    name: second
+    segments:
+      - plan_name: shifted
+        length: 20
+    plans:
+      shifted:
+        distribution:
+          kind: normal
+          mean: 4.0
+          std: 1.0
+        state:
+          type: shifted

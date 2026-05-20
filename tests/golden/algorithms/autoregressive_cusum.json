@@ -1,0 +1,14 @@
+{
+  "algorithm": "AutoregressiveCUSUM",
+  "final_state": {
+    "is_in_learning_period": false,
+    "statistics": {
+      "coefficients": [0.9999999999999993],
+      "history": [1.8],
+      "intercept": 0.20000000000000084,
+      "noise_variance": 3.697785493223493e-32
+    }
+  },
+  "observations": [1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 3.5, 3.7, 3.9],
+  "values": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1499999.9000000001, 3199999.8000000003, 5099999.700000001]
+}

@@ -1,0 +1,128 @@
+import os
+import sys
+import tomllib
+from datetime import datetime
+from pathlib import Path
+
+sys.path.insert(0, os.path.abspath("../../pysatl_cpd"))
+
+ROOT = Path(__file__).resolve().parents[2]
+with (ROOT / "pyproject.toml").open("rb") as pyproject_file:
+    PYPROJECT = tomllib.load(pyproject_file)
+
+project = "PySATL CPD"
+copyright = f"{datetime.now().year}, Leonid Elkin, Mikhail Mikhailov"
+author = "Mikhail Mikhailov"
+release = PYPROJECT["tool"]["poetry"]["version"]
+
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.githubpages",
+    "sphinx_rtd_theme",
+    "myst_nb",
+    "sphinx_autodoc_typehints",
+    "sphinx_copybutton",
+    "sphinx.ext.autosummary",
+]
+autosummary_generate = True
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
+
+# -- Napoleon (NumPy style docstrings) --
+napoleon_google_docstring = False
+napoleon_use_keyword = True
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = True
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = True
+napoleon_use_admonition_for_notes = True
+napoleon_use_admonition_for_references = True
+napoleon_use_ivar = True
+napoleon_use_param = True
+napoleon_use_rtype = True
+napoleon_preprocess_types = True
+napoleon_type_aliases = None
+
+# -- Autodocumentation settings --
+autodoc_default_options = {
+    "member-order": "bysource",
+    "special-members": "__init__",
+    "undoc-members": True,
+    "exclude-members": "__weakref__",
+    "show-inheritance": True,
+}
+
+autodoc_typehints = "description"
+autodoc_typehints_format = "short"
+
+# -- Intersphinx --
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+}
+
+# -- MyST Parser --
+myst_enable_extensions = [
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "tasklist",
+]
+myst_heading_anchors = 3
+nb_execution_mode = "off"
+nb_execution_timeout = 300
+
+# -- HTML --
+html_theme = "sphinx_rtd_theme"
+html_static_path = ["_static"]
+html_css_files = [
+    "custom.css",
+]
+
+# ReadTheDocs
+html_theme_options = {
+    "collapse_navigation": False,
+    "sticky_navigation": True,
+    "navigation_depth": 4,
+    "includehidden": True,
+    "titles_only": False,
+    "logo_only": False,
+}
+
+# Sidebar: show navigation tree, avoid listing all members of the current page
+html_sidebars = {
+    "**": [
+        "about.html",
+        "navigation.html",
+        "relations.html",
+        "searchbox.html",
+    ]
+}
+
+# -- Compile --
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
+copybutton_line_continuation_character = "\\"
+
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+    ".ipynb": "myst-nb",
+}
+
+
+# Some checks
+nitpicky = False

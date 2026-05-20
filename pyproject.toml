@@ -1,0 +1,141 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = [ "poetry-core" ]
+
+[tool.poetry]
+name = "pysatl_cpd"
+version = "0.1.0"
+description = "Batch module for changepoint detection"
+authors = [
+  "Vladimir Kutuev <vladimir.kutuev@gmail.com>",
+  "Mikhail Mikhailov <desiment@yandex.ru>",
+  "Danil Totmyanin <dtotjmyanin@mail.ru>",
+]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/PySATL/pysatl-cpd"
+
+[tool.poetry.dependencies]
+python = ">=3.13,<3.15"
+numpy = ">=2.0.0"
+scipy = ">=1.14.0"
+matplotlib = ">=3.9.1"
+scikit-learn = ">=1.5.2"
+plotly = "^6.6.0"
+pandas = "^3.0.2"
+tqdm = "^4.67.3"
+pyyaml = "^6.0.3"
+ipykernel = "^7.2.0"
+joblib = ">=1.4.0"
+arch = ">=7.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=8.2.2"
+mypy = ">=1.18.1"
+ruff = ">=0.12.0"
+pre-commit = ">=4.1.0"
+hypothesis = ">=6.122.1"
+scipy-stubs = ">=1.15.2"
+pytest-cov = ">=6.0.0"
+gitpython = "^3.1.46"
+pydoclint = "^0.8.4"
+
+[tool.poetry.group.docs.dependencies]
+jupyter = ">=1.1.1"
+notebook = "<7"
+sphinx = "^9.1.0"
+myst-nb = "^1.4.0"
+sphinxcontrib-napoleon = "^0.7"
+sphinx-autodoc-typehints = "^3.9.8"
+linkify-it-py = "^2.1.0"
+sphinx-rtd-theme = "^3.1.0"
+sphinx-copybutton = "^0.5.2"
+
+[tool.poetry.group.aitools.dependencies]
+jupyter-ai = "^3.0.0"
+jupyter-server-mcp = "^0.2.1"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+format.line-ending = "lf"
+
+lint.select = [ "B", "C4", "E", "F", "I", "ISC", "PIE", "SIM", "TID", "UP" ]
+lint.ignore = [ "B008", "E203" ]
+lint.per-file-ignores."**/__init__.py" = [ "F403" ]
+lint.fixable = [ "ALL" ]
+lint.unfixable = [  ]
+
+lint.isort.combine-as-imports = true
+lint.isort.force-single-line = false
+lint.isort.known-first-party = [ "pysatl_cpd" ]
+lint.isort.order-by-type = true
+
+[tool.pydoclint]
+style = "numpy"
+arg-type-hints-in-signature = true
+arg-type-hints-in-docstring = false
+check-return-types = false
+check-yield-types = false
+check-style-mismatch = true
+exclude = '(^|.*/)private(/|$)'
+
+[tool.pytest.ini_options]
+addopts = "-q --cov=pysatl_cpd --cov-report=term-missing"
+testpaths = [ "tests" ]
+
+[tool.coverage.run]
+source = [ "pysatl_cpd" ]
+branch = true
+parallel = true
+omit = [ "pysatl_cpd/analysis/visualization/*", "*/visualizers/*" ]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_also = [
+  'def __repr__',
+  'if self.debug:',
+  'if settings.DEBUG',
+  'raise AssertionError',
+  'raise NotImplementedError',
+  'if 0:',
+  'if __name__ == .__main__.:',
+  'if TYPE_CHECKING:',
+  'class .*\bProtocol\):',
+  '@(abc\.)?abstractmethod',
+]
+
+[tool.mypy]
+files = [ "pysatl_cpd" ]
+python_version = "3.12"
+strict = true
+warn_unused_configs = true
+warn_return_any = true
+disallow_untyped_defs = true
+disallow_any_generics = false
+no_implicit_optional = true
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = [ "." ]
+
+[[tool.mypy.overrides]]
+module = [ "plotly.*" ]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [ "pandas.*", "pandas.*.*" ]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [ "tqdm.*", "tqdm.auto" ]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [ "matplotlib.*", "matplotlib.*.*" ]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [ "yaml" ]
+ignore_missing_imports = true
