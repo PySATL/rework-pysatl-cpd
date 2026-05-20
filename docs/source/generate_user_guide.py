@@ -35,7 +35,7 @@ def _patch_notebook(notebook: dict[str, object], source_path: Path) -> None:
     if not isinstance(cells, list):
         return
 
-    if source_path.stem == "01-core-api-data":
+    if source_path.stem == "01-data-api":
         for cell in cells:
             if not isinstance(cell, dict):
                 continue
@@ -70,9 +70,9 @@ def _patch_notebook(notebook: dict[str, object], source_path: Path) -> None:
     needs_plotly = any(
         source_path.stem == name
         for name in [
-            "04-core-api-visualization",
-            "05-core-api-reset-benchmarking",
-            "06-core-api-noreset-benchmarking",
+            "04-visualization-api",
+            "05-reset-benchmarking-api",
+            "06-noreset-benchmarking-api",
         ]
     )
     if needs_plotly:
