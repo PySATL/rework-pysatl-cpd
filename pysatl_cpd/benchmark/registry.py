@@ -126,19 +126,16 @@ class BenchmarkRegistry(Generic[DataT, TraceT]):
                 continue
             jobs.append((key, provider))
 
-        if n_jobs == 1:
-            for key, provider in tqdm(jobs, desc="Benchmarking providers", unit="provider"):
-                trace: TraceT = cast(TraceT, detector.detect(provider))  # TODO: Runtime check?
-                self._executions_registry[key] = SingleRun(
-                    trace=trace,
-                    provider=provider,
-                )
-            return
-
-        results = Parallel(n_jobs=n_jobs, backend=backend)(
-            delayed(_execute_single_run)(detector, key, provider) for key, provider in jobs
+        parallel = Parallel(
+            n_jobs=n_jobs,
+            backend=backend,
+            return_as="generator",
         )
-        self._executions_registry.update(dict(results))
+
+        results_iter = parallel(delayed(_execute_single_run)(detector, key, provider) for key, provider in jobs)
+
+        for key, run in tqdm(results_iter, total=len(jobs), desc="Benchmarking providers", unit="provider"):
+            self._executions_registry[key] = run
 
     def __getitem__(
         self, key: SingleRunDescription[TimeseriesAnnotation]
