@@ -14,6 +14,7 @@ from typing import Generic, TypeVar, cast
 
 from joblib import Parallel, delayed  # type: ignore[import-untyped]
 from tqdm import tqdm
+from tqdm_joblib import tqdm_joblib  # type: ignore[import-untyped]
 
 from pysatl_cpd.core import ChangePointDetector, DetectionTrace
 from pysatl_cpd.core.single_run import SingleRun, SingleRunDescription
@@ -135,9 +136,10 @@ class BenchmarkRegistry(Generic[DataT, TraceT]):
                 )
             return
 
-        results = Parallel(n_jobs=n_jobs, backend=backend)(
-            delayed(_execute_single_run)(detector, key, provider) for key, provider in jobs
-        )
+        with tqdm_joblib(tqdm(total=len(jobs), desc="Benchmarking providers", unit="provider")):
+            results = Parallel(n_jobs=n_jobs, backend=backend)(
+                delayed(_execute_single_run)(detector, key, provider) for key, provider in jobs
+            )
         self._executions_registry.update(dict(results))
 
     def __getitem__(

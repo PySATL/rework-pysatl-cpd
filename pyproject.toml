@@ -27,6 +27,7 @@ tqdm = "^4.67.3"
 pyyaml = "^6.0.3"
 ipykernel = "^7.2.0"
 joblib = ">=1.4.0"
+tqdm-joblib = ">=0.0.4"
 arch = ">=7.2.0"
 
 [tool.poetry.group.dev.dependencies]
