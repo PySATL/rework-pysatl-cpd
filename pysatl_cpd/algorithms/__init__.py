@@ -72,6 +72,22 @@ CUSUM algorithms:
   ``AutoregressiveCUSUM``.
 - ``AutoregressiveCusumState`` -- State snapshot for ``AutoregressiveCUSUM``.
 
+Symbolic Divergence algorithms:
+
+- ``SymbolicDivergence`` -- Generalized online detector combining a symbol
+  encoder, a divergence, and a change-point statistic.
+- ``SymbolicDivergenceConfiguration`` -- Configuration dataclass for
+  ``SymbolicDivergence``.
+- ``SymbolicDivergenceState`` -- State snapshot for ``SymbolicDivergence``.
+- ``ISymbolEncoder`` -- Protocol for window-to-symbol encoders.
+- ``SlopeEncoder`` -- Two-point slope encoder (``k = 2``).
+- ``IDivergence`` -- Protocol for divergence functions.
+- ``KLDivergence`` -- Kullback-Leibler divergence with smoothing.
+- ``IChangePointStatistic`` -- Protocol for divergence-to-statistic mappings.
+- ``RawDivergenceStatistic`` -- Identity change-point statistic (default).
+- ``ScaledDivergenceStatistic`` -- ``scale * sample_size * divergence``
+  statistic (``scale = 2.0`` reproduces ``2 n D``).
+
 Notes
 -----
 All algorithms require a ``learning_period_size`` of initial observations for

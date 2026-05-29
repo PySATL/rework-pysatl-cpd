@@ -9,7 +9,7 @@ compatible with ``OnlineResetDetector``, ``OnlineCpdSolver``, runtime
 wrappers, and the benchmarking framework.
 
 The package re-exports concrete algorithms and their associated
-configuration/state dataclasses from three subpackages:
+configuration/state dataclasses from four subpackages:
 
 - ``bayesian`` -- Bayesian online change-point detection (BOCPD) following
   the Adams and MacKay (2007) message-passing framework. Includes an
@@ -25,6 +25,12 @@ configuration/state dataclasses from three subpackages:
   Page's two-sided CUSUM, the Crosier multivariate statistic, variance
   change detection, and autoregressive time series detection. See the
   :mod:`~pysatl_cpd.algorithms.online.cusum` docstring for details.
+- ``symbolic_divergence`` -- A generalized symbolic-encoding detector that
+  monitors the divergence between the running empirical symbol distribution
+  and a reference distribution, with pluggable encoder, divergence, and
+  change-point statistic components. See the
+  :mod:`~pysatl_cpd.algorithms.online.symbolic_divergence` docstring for
+  details.
 
 The ``classification`` directory is an internal implementation detail and
 is not part of the public API.
@@ -81,6 +87,22 @@ CUSUM algorithms (from ``cusum``):
 - ``AutoregressiveCusumConfiguration`` -- Configuration dataclass for
   ``AutoregressiveCUSUM``.
 - ``AutoregressiveCusumState`` -- State snapshot for ``AutoregressiveCUSUM``.
+
+Symbolic Divergence algorithms (from ``symbolic_divergence``):
+
+- ``SymbolicDivergence`` -- Generalized online detector combining a symbol
+  encoder, a divergence, and a change-point statistic.
+- ``SymbolicDivergenceConfiguration`` -- Configuration dataclass for
+  ``SymbolicDivergence``.
+- ``SymbolicDivergenceState`` -- State snapshot for ``SymbolicDivergence``.
+- ``ISymbolEncoder`` -- Protocol for window-to-symbol encoders.
+- ``SlopeEncoder`` -- Two-point slope encoder (``k = 2``).
+- ``IDivergence`` -- Protocol for divergence functions.
+- ``KLDivergence`` -- Kullback-Leibler divergence with smoothing.
+- ``IChangePointStatistic`` -- Protocol for divergence-to-statistic mappings.
+- ``RawDivergenceStatistic`` -- Identity change-point statistic (default).
+- ``ScaledDivergenceStatistic`` -- ``scale * sample_size * divergence``
+  statistic (``scale = 2.0`` reproduces ``2 n D``).
 
 Notes
 -----
@@ -174,6 +196,18 @@ from pysatl_cpd.algorithms.online.cusum.algorithm import (
     VarianceTwoSidedCusumConfiguration,
     VarianceTwoSidedCusumState,
 )
+from pysatl_cpd.algorithms.online.symbolic_divergence import (
+    IChangePointStatistic,
+    IDivergence,
+    ISymbolEncoder,
+    KLDivergence,
+    RawDivergenceStatistic,
+    ScaledDivergenceStatistic,
+    SlopeEncoder,
+    SymbolicDivergence,
+    SymbolicDivergenceConfiguration,
+    SymbolicDivergenceState,
+)
 
 __all__ = [
     "AbstractBayesian",
@@ -186,12 +220,22 @@ __all__ = [
     "CrosierCusum",
     "CrosierCusumConfiguration",
     "CrosierCusumState",
+    "IChangePointStatistic",
+    "IDivergence",
+    "ISymbolEncoder",
+    "KLDivergence",
     "PageTwoSidedCusum",
     "PageTwoSidedCusumConfiguration",
     "PageTwoSidedCusumState",
+    "RawDivergenceStatistic",
+    "ScaledDivergenceStatistic",
     "ShewhartControlChart",
     "ShewhartControlChartConfiguration",
     "ShewhartControlChartState",
+    "SlopeEncoder",
+    "SymbolicDivergence",
+    "SymbolicDivergenceConfiguration",
+    "SymbolicDivergenceState",
     "UnivariateGaussianConjugateBOCPD",
     "UnivariateGaussianConjugateBOCPDConfiguration",
     "UnivariateGaussianConjugateBOCPDState",
