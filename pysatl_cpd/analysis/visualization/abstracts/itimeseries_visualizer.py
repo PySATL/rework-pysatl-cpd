@@ -27,16 +27,11 @@ class ITimeseriesVisualizer[DataProviderT: DataProvider[Any, TimeseriesAnnotatio
     optionally with ground truth change points, detected change points,
     and annotation of learning and skip periods.
 
-    Type Parameters
-    ---------------
-    DataProviderT : DataProvider
-        The data provider type bound by DataProvider, containing the
-        observations to be visualized.
-
     Notes
     -----
-    The type parameter DataProviderT is bound to DataProvider to ensure
-    that any concrete implementation works with valid data providers.
+    The generic DataProviderT type is bound by DataProvider and contains the
+    observations to be visualized. The bound ensures that any concrete
+    implementation works with valid data providers.
     """
 
     @abstractmethod

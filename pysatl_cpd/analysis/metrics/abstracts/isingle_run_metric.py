@@ -16,14 +16,10 @@ from pysatl_cpd.data.providers.labeled.labeled_data import LabeledData as Labele
 class ISingleRunMetric[TraceT: DetectionTrace, ProviderT: LabeledData, ResultT](ABC):
     """Base class for metrics that evaluate one run.
 
-    Type Parameters
-    ---------------
-    TraceT
-        Detection trace type.
-    ProviderT
-        Labeled data provider type.
-    ResultT
-        Metric result type.
+    Notes
+    -----
+    The generic parameters identify the detection trace type, labeled data
+    provider type, and metric result type.
     """
 
     @abstractmethod

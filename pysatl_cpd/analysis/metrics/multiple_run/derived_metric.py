@@ -21,16 +21,10 @@ class DerivedMetric[TraceT: DetectionTrace, ProviderT: LabeledData[Any, Any], Re
 ):
     """Evaluate several multi-run metrics and combine their outputs.
 
-    Type Parameters
-    ---------------
-    TraceT
-        Detection trace type.
-    ProviderT
-        Labeled data provider type.
-    ResultInT
-        Input metric result type.
-    ResultOutT
-        Derived metric result type.
+    Notes
+    -----
+    The generic parameters identify the detection trace type, labeled data
+    provider type, input metric result type, and derived metric result type.
     """
 
     @property

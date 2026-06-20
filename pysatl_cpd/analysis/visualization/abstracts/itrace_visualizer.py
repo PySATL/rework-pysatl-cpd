@@ -25,19 +25,12 @@ class ITraceVisualizer[DetectionTraceT: DetectionTrace](IVisualizer, ABC):
     Visualizers of this type render detection results, including detection
     function values and algorithm metadata.
 
-    Type Parameters
-    ---------------
-    DetectionTraceT : DetectionTrace
-        The detection trace type bound by DetectionTrace. This allows
-        visualizers to work with specific trace implementations such as
-        OnlineDetectionTrace or OfflineDetectionTrace.
-
     Notes
     -----
-    The type parameter DetectionTraceT is bound to DetectionTrace to ensure
-    that any concrete implementation works with valid detection traces.
-    Due to mypy limitations with generic bounds, a type-ignore comment
-    is used on the TypeVar definition.
+    The generic DetectionTraceT type is bound by DetectionTrace. This allows
+    visualizers to work with specific trace implementations such as
+    OnlineDetectionTrace or OfflineDetectionTrace and ensures that any
+    concrete implementation works with valid detection traces.
     """
 
     @abstractmethod
