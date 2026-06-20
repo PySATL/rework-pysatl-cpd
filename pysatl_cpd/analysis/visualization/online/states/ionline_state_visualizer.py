@@ -26,17 +26,12 @@ class IOnlineStateVisualizer[OnlineAlgorithmStateT: OnlineAlgorithmState](IVisua
     Visualizers of this type render the evolution of algorithm state
     over time, showing how internal statistics change with each observation.
 
-    Type Parameters
-    ---------------
-    OnlineAlgorithmStateT : OnlineAlgorithmState
-        The algorithm state type bound by OnlineAlgorithmState. This allows
-        visualizers to work with specific state implementations such as
-        ShewhartControlChartState.
-
     Notes
     -----
-    The type parameter is bound to OnlineAlgorithmState to ensure that
-    any concrete implementation works with valid algorithm state objects.
+    The generic OnlineAlgorithmStateT type is bound by OnlineAlgorithmState.
+    This allows visualizers to work with specific state implementations such
+    as ShewhartControlChartState and ensures that any concrete implementation
+    works with valid algorithm state objects.
     """
 
     @abstractmethod

@@ -24,16 +24,10 @@ class AggregationMetric[TraceT: DetectionTrace, ProviderT: LabeledData[Any, Any]
 ):
     """Evaluate a single-run metric on each run and aggregate the results.
 
-    Type Parameters
-    ---------------
-    TraceT
-        Detection trace type.
-    ProviderT
-        Labeled data provider type.
-    ResultInT
-        Per-run metric result type.
-    ResultOutT
-        Aggregated result type.
+    Notes
+    -----
+    The generic parameters identify the detection trace type, labeled data
+    provider type, per-run metric result type, and aggregated result type.
     """
 
     @property
