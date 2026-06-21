@@ -28,7 +28,8 @@ configuration/state dataclasses from four subpackages:
 - ``symbolic_divergence`` -- A generalized symbolic-encoding detector that
   monitors the divergence between the running empirical symbol distribution
   and a reference distribution, with pluggable encoder, divergence, and
-  change-point statistic components. See the
+  change-point statistic components. A windowed variant compares a fixed
+  recent window of symbols against a growing reference. See the
   :mod:`~pysatl_cpd.algorithms.online.symbolic_divergence` docstring for
   details.
 
@@ -100,6 +101,18 @@ Symbolic Divergence algorithms (from ``symbolic_divergence``):
   ``SlopeKLSymbolicDivergence``.
 - ``SlopeKLSymbolicDivergenceState`` -- State snapshot for
   ``SlopeKLSymbolicDivergence``.
+- ``WindowedSymbolicDivergence`` -- Abstract, generic windowed detector
+  comparing a fixed recent window of symbols against a growing reference.
+- ``WindowedSymbolicDivergenceConfiguration`` -- Base configuration dataclass
+  for the windowed detector (adds ``recent_window_size``).
+- ``WindowedSymbolicDivergenceState`` -- Base state snapshot for the windowed
+  detector.
+- ``WindowedSlopeKLSymbolicDivergence`` -- Concrete windowed slope-encoder +
+  KL-divergence detector.
+- ``WindowedSlopeKLSymbolicDivergenceConfiguration`` -- Configuration for
+  ``WindowedSlopeKLSymbolicDivergence``.
+- ``WindowedSlopeKLSymbolicDivergenceState`` -- State snapshot for
+  ``WindowedSlopeKLSymbolicDivergence``.
 - ``ISymbolEncoder`` -- Protocol for window-to-symbol encoders.
 - ``SlopeEncoder`` -- Two-point slope encoder (``k = 2``).
 - ``IDivergence`` -- Protocol for divergence functions.
@@ -108,6 +121,8 @@ Symbolic Divergence algorithms (from ``symbolic_divergence``):
 - ``RawDivergenceStatistic`` -- Identity change-point statistic (default).
 - ``ScaledDivergenceStatistic`` -- ``scale * sample_size * divergence``
   statistic (``scale = 2.0`` reproduces ``2 n D``).
+- ``LogScaledDivergenceStatistic`` -- ``scale * sample_size /
+  log(sample_size + 1) * divergence`` statistic.
 
 Notes
 -----
@@ -206,6 +221,7 @@ from pysatl_cpd.algorithms.online.symbolic_divergence import (
     IDivergence,
     ISymbolEncoder,
     KLDivergence,
+    LogScaledDivergenceStatistic,
     RawDivergenceStatistic,
     ScaledDivergenceStatistic,
     SlopeEncoder,
@@ -215,6 +231,12 @@ from pysatl_cpd.algorithms.online.symbolic_divergence import (
     SymbolicDivergence,
     SymbolicDivergenceConfiguration,
     SymbolicDivergenceState,
+    WindowedSlopeKLSymbolicDivergence,
+    WindowedSlopeKLSymbolicDivergenceConfiguration,
+    WindowedSlopeKLSymbolicDivergenceState,
+    WindowedSymbolicDivergence,
+    WindowedSymbolicDivergenceConfiguration,
+    WindowedSymbolicDivergenceState,
 )
 
 __all__ = [
@@ -232,6 +254,7 @@ __all__ = [
     "IDivergence",
     "ISymbolEncoder",
     "KLDivergence",
+    "LogScaledDivergenceStatistic",
     "PageTwoSidedCusum",
     "PageTwoSidedCusumConfiguration",
     "PageTwoSidedCusumState",
@@ -253,4 +276,10 @@ __all__ = [
     "VarianceTwoSidedCUSUM",
     "VarianceTwoSidedCusumConfiguration",
     "VarianceTwoSidedCusumState",
+    "WindowedSlopeKLSymbolicDivergence",
+    "WindowedSlopeKLSymbolicDivergenceConfiguration",
+    "WindowedSlopeKLSymbolicDivergenceState",
+    "WindowedSymbolicDivergence",
+    "WindowedSymbolicDivergenceConfiguration",
+    "WindowedSymbolicDivergenceState",
 ]

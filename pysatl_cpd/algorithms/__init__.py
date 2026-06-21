@@ -84,6 +84,18 @@ Symbolic Divergence algorithms:
   ``SlopeKLSymbolicDivergence``.
 - ``SlopeKLSymbolicDivergenceState`` -- State snapshot for
   ``SlopeKLSymbolicDivergence``.
+- ``WindowedSymbolicDivergence`` -- Abstract, generic windowed detector
+  comparing a fixed recent window of symbols against a growing reference.
+- ``WindowedSymbolicDivergenceConfiguration`` -- Base configuration dataclass
+  for the windowed detector (adds ``recent_window_size``).
+- ``WindowedSymbolicDivergenceState`` -- Base state snapshot for the windowed
+  detector.
+- ``WindowedSlopeKLSymbolicDivergence`` -- Concrete windowed slope-encoder +
+  KL-divergence detector.
+- ``WindowedSlopeKLSymbolicDivergenceConfiguration`` -- Configuration for
+  ``WindowedSlopeKLSymbolicDivergence``.
+- ``WindowedSlopeKLSymbolicDivergenceState`` -- State snapshot for
+  ``WindowedSlopeKLSymbolicDivergence``.
 - ``ISymbolEncoder`` -- Protocol for window-to-symbol encoders.
 - ``SlopeEncoder`` -- Two-point slope encoder (``k = 2``).
 - ``IDivergence`` -- Protocol for divergence functions.
@@ -92,6 +104,8 @@ Symbolic Divergence algorithms:
 - ``RawDivergenceStatistic`` -- Identity change-point statistic (default).
 - ``ScaledDivergenceStatistic`` -- ``scale * sample_size * divergence``
   statistic (``scale = 2.0`` reproduces ``2 n D``).
+- ``LogScaledDivergenceStatistic`` -- ``scale * sample_size /
+  log(sample_size + 1) * divergence`` statistic.
 
 Notes
 -----
