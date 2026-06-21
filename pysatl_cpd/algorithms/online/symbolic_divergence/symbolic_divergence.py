@@ -273,15 +273,13 @@ class SymbolicDivergence(OnlineAlgorithm[Number, SymbolicDivergenceConfiguration
         """Reset the algorithm to its initial state.
 
         Clears the sliding window, symbol counts, reference distribution, and
-        sample counter, and resets the encoder, divergence, and statistic
-        components.
+        sample counter, and resets the encoder and statistic components.
 
         Returns
         -------
         None
         """
         self._encoder.reset()
-        self._divergence.reset()
         self._statistic.reset()
         self._window.clear()
         self._symbol_counts = [0] * self._encoder.num_symbols
@@ -298,7 +296,3 @@ class SymbolicDivergence(OnlineAlgorithm[Number, SymbolicDivergenceConfiguration
         algorithm = deepcopy(self)
         algorithm.reset()
         return algorithm
-
-    def __repr__(self) -> str:
-        """Return a string representation of the algorithm with its configuration."""
-        return f"SymbolicDivergence({self._configuration})"

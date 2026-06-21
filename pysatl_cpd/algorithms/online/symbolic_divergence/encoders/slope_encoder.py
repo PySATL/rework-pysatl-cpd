@@ -49,6 +49,8 @@ class SlopeEncoder(ISymbolEncoder[int]):
     def __init__(self, delta: float, gamma: float) -> None:
         if delta < 0.0:
             raise ValueError(f"delta must be non-negative, got {delta}")
+        if gamma <= 0.0:
+            raise ValueError(f"gamma must be positive, got {gamma}")
         if gamma <= delta:
             raise ValueError(f"gamma ({gamma}) must be strictly greater than delta ({delta})")
 

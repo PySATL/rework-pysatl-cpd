@@ -18,7 +18,13 @@ from pysatl_cpd.typedefs import UnivariateNumericArray
 
 
 class IDivergence(Protocol):
-    """Interface for divergences between discrete probability distributions."""
+    """Interface for divergences between discrete symbol distributions.
+
+    The two arguments are non-negative symbol frequencies: either raw counts
+    or already-normalised probabilities. They need not sum to one;
+    implementations are expected to normalise internally. The divergence is a
+    pure function and therefore stateless (no ``reset`` is required).
+    """
 
     def compute(self, empirical: UnivariateNumericArray, reference: UnivariateNumericArray) -> float:
         """Compute the divergence ``D(empirical || reference)``.
@@ -26,19 +32,13 @@ class IDivergence(Protocol):
         Parameters
         ----------
         empirical
-            Empirical symbol frequencies. Non-negative and summing to one.
+            Empirical symbol frequencies (raw counts or probabilities).
+            Non-negative; need not sum to one.
         reference
-            Reference symbol probabilities. Non-negative and summing to one.
+            Reference symbol frequencies (raw counts or probabilities).
+            Non-negative; need not sum to one.
 
         Returns
         -------
         float
-        """
-
-    def reset(self) -> None:
-        """Reset internal state, if any.
-
-        Returns
-        -------
-        None
         """
