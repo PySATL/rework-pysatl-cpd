@@ -1,0 +1,41 @@
+{
+  "algorithm": "SlopeKLSymbolicDivergence",
+  "final_state": {
+    "is_in_learning_period": false,
+    "reference_distribution": [
+      0.0,
+      0.5,
+      0.0,
+      0.5,
+      0.0
+    ],
+    "samples_count": 8,
+    "symbol_counts": [
+      1,
+      2,
+      0,
+      1,
+      3
+    ]
+  },
+  "observations": [
+    0.0,
+    1.0,
+    0.5,
+    2.0,
+    5.0,
+    -3.0,
+    0.2,
+    0.1
+  ],
+  "values": [
+    0.0,
+    0.0,
+    0.0,
+    42.232616852312034,
+    86.55822627848227,
+    127.60590390398129,
+    172.06995626823544,
+    170.48721089615736
+  ]
+}

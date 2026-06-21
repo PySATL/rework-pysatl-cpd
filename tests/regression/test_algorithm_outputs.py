@@ -19,6 +19,7 @@ from pysatl_cpd.algorithms.online import (
     CrosierCusum,
     PageTwoSidedCusum,
     ShewhartControlChart,
+    SlopeKLSymbolicDivergence,
     UnivariateGaussianConjugateBOCPD,
     VarianceTwoSidedCUSUM,
 )
@@ -76,6 +77,10 @@ def _observation(value):
         (
             "autoregressive_cusum",
             AutoregressiveCUSUM(learning_period_size=5, delta=0.1, autoreg_order=1, adaptive_estimation=False),
+        ),
+        (
+            "slope_kl_symbolic_divergence",
+            SlopeKLSymbolicDivergence(learning_period_size=3, delta=0.0, gamma=1.0),
         ),
         (
             "univariate_gaussian_conjugate_bocpd",
