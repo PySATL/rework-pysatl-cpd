@@ -11,12 +11,21 @@ to a change-point statistic via a pluggable component.
 The encoding (``h: R^k -> S``), divergence, and change-point statistic are
 pluggable components, which makes the Slope-encoding + Kullback-Leibler +
 ``2 n D`` combination a single special case of a broader family.
+
+:class:`SymbolicDivergence` is an abstract base that is generic over its
+configuration and state types, mirroring the ``GeneralizedCUSUM`` design.
+Concrete detectors (such as ``SlopeKLSymbolicDivergence``) subclass it, bake
+their component parameters into a dedicated frozen configuration, and implement
+the ``configuration`` and ``state`` properties. Keeping the component parameters
+in the configuration is what lets distinct detector instances hash differently
+in the benchmarking framework.
 """
 
 __author__ = "Yulia Burmistrova"
 __copyright__ = "Copyright (c) 2026 PySATL project"
 __license__ = "SPDX-License-Identifier: MIT"
 
+from abc import abstractmethod
 from collections import deque
 from copy import deepcopy
 from dataclasses import dataclass
@@ -105,9 +114,12 @@ class SymbolicDivergenceConfiguration(OnlineAlgorithmConfiguration):
         return stable_hash((type(self).__module__, type(self).__qualname__, self.learning_period_size))
 
 
-class SymbolicDivergence(OnlineAlgorithm[Number, SymbolicDivergenceConfiguration, SymbolicDivergenceState]):
+class SymbolicDivergence[
+    ConfigurationT: SymbolicDivergenceConfiguration,
+    StateT: SymbolicDivergenceState,
+](OnlineAlgorithm[Number, ConfigurationT, StateT]):
     """
-    Online change-point detector based on symbolic encoding and divergence.
+    Abstract online change-point detector based on symbolic encoding.
 
     During the learning period the algorithm encodes each sliding window of
     ``encoder.window_size`` observations into a symbol, accumulates the symbol
@@ -116,15 +128,17 @@ class SymbolicDivergence(OnlineAlgorithm[Number, SymbolicDivergenceConfiguration
     distribution and that reference, then delegates the final emitted value to
     the change-point statistic component.
 
-    No threshold is applied here; thresholding is the responsibility of the
-    detector (for example ``OnlineResetDetector``).
+    The class is generic over its configuration and state types so that
+    concrete detectors can extend both. Subclasses build a configuration that
+    stores the component parameters and implement the ``configuration`` and
+    ``state`` properties. No threshold is applied here; thresholding is the
+    responsibility of the detector (for example ``OnlineResetDetector``).
 
     Parameters
     ----------
-    learning_period_size
-        Number of initial observations used to estimate the reference
-        distribution. Must be positive and strictly greater than
-        ``encoder.window_size``.
+    configuration
+        Algorithm configuration. Its ``learning_period_size`` must be strictly
+        greater than ``encoder.window_size``.
     encoder
         Window-to-symbol encoder implementing ``ISymbolEncoder``.
     divergence
@@ -137,24 +151,24 @@ class SymbolicDivergence(OnlineAlgorithm[Number, SymbolicDivergenceConfiguration
     Raises
     ------
     ValueError
-        If ``learning_period_size`` is not positive, or is not strictly
-        greater than ``encoder.window_size``.
+        If ``configuration.learning_period_size`` is not strictly greater than
+        ``encoder.window_size``.
     """
 
     def __init__(
         self,
-        learning_period_size: int,
+        configuration: ConfigurationT,
         encoder: ISymbolEncoder[int],
         divergence: IDivergence,
         statistic: IChangePointStatistic | None = None,
     ) -> None:
-        self._configuration = SymbolicDivergenceConfiguration(learning_period_size=learning_period_size)
-        if learning_period_size <= encoder.window_size:
+        if configuration.learning_period_size <= encoder.window_size:
             raise ValueError(
-                f"learning_period_size ({learning_period_size}) must be strictly greater "
-                f"than encoder.window_size ({encoder.window_size})"
+                f"learning_period_size ({configuration.learning_period_size}) must be strictly "
+                f"greater than encoder.window_size ({encoder.window_size})"
             )
 
+        self._configuration = configuration
         self._encoder = encoder
         self._divergence = divergence
         self._statistic: IChangePointStatistic = statistic if statistic is not None else RawDivergenceStatistic()
@@ -194,39 +208,52 @@ class SymbolicDivergence(OnlineAlgorithm[Number, SymbolicDivergenceConfiguration
         return self._statistic
 
     @property
-    def name(self) -> str:
-        """Human-readable algorithm name.
+    def samples_count(self) -> int:
+        """Number of observations processed so far.
 
         Returns
         -------
-        str
+        int
         """
-        return "SymbolicDivergence"
+        return self._samples_count
 
     @property
-    def configuration(self) -> SymbolicDivergenceConfiguration:
-        """Current algorithm configuration.
+    def symbol_counts(self) -> tuple[int, ...]:
+        """Cumulative per-symbol counts in canonical (encoder) order.
 
         Returns
         -------
-        SymbolicDivergenceConfiguration
+        tuple[int, ...]
         """
-        return self._configuration
+        return tuple(self._symbol_counts)
 
     @property
-    def state(self) -> SymbolicDivergenceState:
-        """Materialise an immutable state snapshot.
+    def reference_distribution(self) -> tuple[float, ...]:
+        """Reference distribution fixed at the end of the learning period.
 
         Returns
         -------
-        SymbolicDivergenceState
+        tuple[float, ...]
         """
-        return SymbolicDivergenceState(
-            is_in_learning_period=self._samples_count <= self._configuration.learning_period_size,
-            samples_count=self._samples_count,
-            symbol_counts=tuple(self._symbol_counts),
-            reference_distribution=(tuple(self._reference.tolist()) if self._reference is not None else ()),
-        )
+        return tuple(self._reference.tolist()) if self._reference is not None else ()
+
+    @property
+    def is_in_learning_period(self) -> bool:
+        """Whether the algorithm is still within its learning period.
+
+        Returns
+        -------
+        bool
+        """
+        return self._samples_count <= self._configuration.learning_period_size
+
+    @property
+    @abstractmethod
+    def configuration(self) -> ConfigurationT: ...  # pragma: no cover
+
+    @property
+    @abstractmethod
+    def state(self) -> StateT: ...  # pragma: no cover
 
     def process(self, observation: Number) -> Number:
         """Ingest one observation and return the change-point statistic.

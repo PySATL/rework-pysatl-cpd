@@ -90,11 +90,16 @@ CUSUM algorithms (from ``cusum``):
 
 Symbolic Divergence algorithms (from ``symbolic_divergence``):
 
-- ``SymbolicDivergence`` -- Generalized online detector combining a symbol
+- ``SymbolicDivergence`` -- Abstract, generic base detector combining a symbol
   encoder, a divergence, and a change-point statistic.
-- ``SymbolicDivergenceConfiguration`` -- Configuration dataclass for
-  ``SymbolicDivergence``.
-- ``SymbolicDivergenceState`` -- State snapshot for ``SymbolicDivergence``.
+- ``SymbolicDivergenceConfiguration`` -- Base configuration dataclass.
+- ``SymbolicDivergenceState`` -- Base state snapshot.
+- ``SlopeKLSymbolicDivergence`` -- Concrete slope-encoder + KL-divergence
+  detector storing component parameters in its configuration.
+- ``SlopeKLSymbolicDivergenceConfiguration`` -- Configuration for
+  ``SlopeKLSymbolicDivergence``.
+- ``SlopeKLSymbolicDivergenceState`` -- State snapshot for
+  ``SlopeKLSymbolicDivergence``.
 - ``ISymbolEncoder`` -- Protocol for window-to-symbol encoders.
 - ``SlopeEncoder`` -- Two-point slope encoder (``k = 2``).
 - ``IDivergence`` -- Protocol for divergence functions.
@@ -204,6 +209,9 @@ from pysatl_cpd.algorithms.online.symbolic_divergence import (
     RawDivergenceStatistic,
     ScaledDivergenceStatistic,
     SlopeEncoder,
+    SlopeKLSymbolicDivergence,
+    SlopeKLSymbolicDivergenceConfiguration,
+    SlopeKLSymbolicDivergenceState,
     SymbolicDivergence,
     SymbolicDivergenceConfiguration,
     SymbolicDivergenceState,
@@ -233,6 +241,9 @@ __all__ = [
     "ShewhartControlChartConfiguration",
     "ShewhartControlChartState",
     "SlopeEncoder",
+    "SlopeKLSymbolicDivergence",
+    "SlopeKLSymbolicDivergenceConfiguration",
+    "SlopeKLSymbolicDivergenceState",
     "SymbolicDivergence",
     "SymbolicDivergenceConfiguration",
     "SymbolicDivergenceState",

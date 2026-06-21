@@ -29,13 +29,20 @@ case of a broader family:
 
     <h2>Public API</h2>
 
-Algorithm:
+Algorithms:
 
-- ``SymbolicDivergence`` -- Generalized online detector combining a symbol
-  encoder, a divergence, and a change-point statistic.
-- ``SymbolicDivergenceConfiguration`` -- Configuration dataclass for
-  ``SymbolicDivergence``.
-- ``SymbolicDivergenceState`` -- State snapshot for ``SymbolicDivergence``.
+- ``SymbolicDivergence`` -- Abstract, generic online detector combining a
+  symbol encoder, a divergence, and a change-point statistic. Subclass it to
+  build concrete detectors.
+- ``SymbolicDivergenceConfiguration`` -- Base configuration dataclass.
+- ``SymbolicDivergenceState`` -- Base state snapshot.
+- ``SlopeKLSymbolicDivergence`` -- Concrete detector using a slope encoder and
+  Kullback-Leibler divergence; stores component parameters in its
+  configuration.
+- ``SlopeKLSymbolicDivergenceConfiguration`` -- Configuration for
+  ``SlopeKLSymbolicDivergence``.
+- ``SlopeKLSymbolicDivergenceState`` -- State snapshot for
+  ``SlopeKLSymbolicDivergence``.
 
 Encoder components (from ``encoders``):
 
@@ -61,6 +68,11 @@ __license__ = "SPDX-License-Identifier: MIT"
 
 from pysatl_cpd.algorithms.online.symbolic_divergence.divergences import IDivergence, KLDivergence
 from pysatl_cpd.algorithms.online.symbolic_divergence.encoders import ISymbolEncoder, SlopeEncoder
+from pysatl_cpd.algorithms.online.symbolic_divergence.slope_kl_symbolic_divergence import (
+    SlopeKLSymbolicDivergence,
+    SlopeKLSymbolicDivergenceConfiguration,
+    SlopeKLSymbolicDivergenceState,
+)
 from pysatl_cpd.algorithms.online.symbolic_divergence.statistics import (
     IChangePointStatistic,
     RawDivergenceStatistic,
@@ -80,6 +92,9 @@ __all__ = [
     "RawDivergenceStatistic",
     "ScaledDivergenceStatistic",
     "SlopeEncoder",
+    "SlopeKLSymbolicDivergence",
+    "SlopeKLSymbolicDivergenceConfiguration",
+    "SlopeKLSymbolicDivergenceState",
     "SymbolicDivergence",
     "SymbolicDivergenceConfiguration",
     "SymbolicDivergenceState",
