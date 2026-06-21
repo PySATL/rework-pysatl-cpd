@@ -22,6 +22,7 @@ from pysatl_cpd.algorithms.online import (
     SlopeKLSymbolicDivergence,
     UnivariateGaussianConjugateBOCPD,
     VarianceTwoSidedCUSUM,
+    WindowedSlopeKLSymbolicDivergence,
 )
 from pysatl_cpd.algorithms.online.bayesian import BayesianCPFType
 from tests.support.golden import load_json_golden
@@ -81,6 +82,10 @@ def _observation(value):
         (
             "slope_kl_symbolic_divergence",
             SlopeKLSymbolicDivergence(learning_period_size=3, delta=0.0, gamma=1.0),
+        ),
+        (
+            "windowed_slope_kl_symbolic_divergence",
+            WindowedSlopeKLSymbolicDivergence(learning_period_size=3, recent_window_size=4, delta=0.0, gamma=1.0),
         ),
         (
             "univariate_gaussian_conjugate_bocpd",
