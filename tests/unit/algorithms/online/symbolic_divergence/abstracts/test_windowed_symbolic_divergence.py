@@ -144,6 +144,23 @@ class TestWindowedSymbolicDivergenceProcess:
         assert any(value != 0.0 for value in emitted)
         assert all(math.isfinite(float(value)) for value in emitted)
 
+    def test_emits_zero_until_recent_window_fills(self) -> None:
+        algorithm = _MinimalWindowedSymbolicDivergence(learning_period_size=3, recent_window_size=4)
+        emitted = [algorithm.process(value) for value in [0.0, 2.0, 4.0, 5.0, 4.0, 8.0, 7.0]]
+        assert emitted[:6] == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        assert emitted[6] != 0.0
+
+    def test_reference_distribution_updates_when_window_slides(self) -> None:
+        algorithm = _MinimalWindowedSymbolicDivergence(learning_period_size=3, recent_window_size=4)
+        for value in [0.0, 2.0, 4.0, 5.0, 4.0, 8.0, 7.0]:
+            algorithm.process(value)
+
+        reference_before = algorithm.reference_distribution
+        assert reference_before != ()
+
+        algorithm.process(9.0)
+        assert algorithm.reference_distribution != reference_before
+
     def test_recent_window_counts_are_bounded(self) -> None:
         algorithm = _MinimalWindowedSymbolicDivergence(learning_period_size=3, recent_window_size=3)
         for value in [0.0, 2.0, 4.0, 6.0, 0.0, 5.0, -5.0, 2.0, 7.0, -1.0]:
@@ -162,6 +179,17 @@ class TestWindowedSymbolicDivergenceReset:
         assert algorithm.is_in_learning_period is True
         assert algorithm.reference_distribution == ()
         assert sum(algorithm.symbol_counts) == 0
+
+    def test_reset_resets_statistic_component(self) -> None:
+        statistic = LogScaledDivergenceStatistic()
+        statistic.update(1.0, 1)
+        algorithm = _MinimalWindowedSymbolicDivergence(
+            learning_period_size=3, recent_window_size=4, statistic=statistic
+        )
+        assert statistic.value != 0.0
+
+        algorithm.reset()
+        assert statistic.value == 0.0
 
 
 class TestWindowedSymbolicDivergenceRecreate:
