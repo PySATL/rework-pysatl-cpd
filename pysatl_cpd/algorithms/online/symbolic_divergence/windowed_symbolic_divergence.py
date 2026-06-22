@@ -32,7 +32,7 @@ from abc import abstractmethod
 from collections import deque
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Self
+from typing import Self, cast
 
 import numpy as np
 
@@ -326,10 +326,8 @@ class WindowedSymbolicDivergence[
             self._symbol_counts[symbol_index] += 1
             return 0.0
 
-        reference_counts = self._reference_counts
-        reference = self._reference
-        if reference_counts is None or reference is None:
-            return 0.0
+        reference_counts = cast(UnivariateNumericArray, self._reference_counts)
+        reference = cast(UnivariateNumericArray, self._reference)
 
         if len(self._recent_symbols) == self._recent_symbols_maxlen:
             dropped_symbol_index = self._recent_symbols.popleft()
